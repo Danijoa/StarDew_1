@@ -4,12 +4,11 @@
 
 HRESULT TilemapTool::Init()
 {
-	//크기 조정
+	// 크기 조정
 	SetClientRect(g_hWnd, TILEMAPTOOLSIZE_X, TILEMAPTOOLSIZE_Y);
 
 	/*확인용임*/
-	ImageManager::GetSingleton()->AddImage("test",
-		"Image/SummerFarm.bmp", 1280, 1040);
+	ImageManager::GetSingleton()->AddImage("test", "Image/SpringFarm.bmp", 1280, 1040);
 	test = ImageManager::GetSingleton()->FindImage("test");
 
 	return S_OK;
@@ -29,7 +28,7 @@ void TilemapTool::Render(HDC hdc)
 
 	if (test)
 	{
-		test->Render(hdc, -626, 0);
+		test->Render(hdc, 0, 0);
 	}
 }
 

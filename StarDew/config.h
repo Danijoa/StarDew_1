@@ -25,9 +25,9 @@ using namespace std;
 // 타일찍기 창
 #define TILEMAPTOOLSIZE_X	1900
 #define TILEMAPTOOLSIZE_Y	900
-#define TILESIZE 15
-#define TILE_X 50
-#define TILE_Y 50
+#define TILESIZE 16
+#define TILE_X 4
+#define TILE_Y 8
 
 //
 #define PI			3.141592f
@@ -50,7 +50,7 @@ typedef struct tagTile
 	TileType currTile;
 } TILE_INFO;
 
-typedef struct tagTile
+typedef struct myPair
 {
 	int x;
 	int y;
