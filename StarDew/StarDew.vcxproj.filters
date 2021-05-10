@@ -28,6 +28,15 @@
     <Filter Include="Scene">
       <UniqueIdentifier>{e7e89ddb-3eb1-47c6-8178-68f7c8708caa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Button">
+      <UniqueIdentifier>{092f5111-7e41-448e-ac8a-c2315e4c8e6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{7d47ce9f-daee-4bca-80f0-366c3a2816d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Collision">
+      <UniqueIdentifier>{c744a611-8f2a-4351-a9c3-2b626dbbe29f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -59,6 +68,21 @@
     </ClCompile>
     <ClCompile Include="StartScene.cpp">
       <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Button</Filter>
+    </ClCompile>
+    <ClCompile Include="HouseScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="FarmScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionCheck.cpp">
+      <Filter>Collision</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +124,21 @@
     </ClInclude>
     <ClInclude Include="StartScene.h">
       <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Button</Filter>
+    </ClInclude>
+    <ClInclude Include="HouseScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="FarmScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Player</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionCheck.h">
+      <Filter>Collision</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

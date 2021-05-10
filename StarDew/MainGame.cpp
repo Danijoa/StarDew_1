@@ -2,6 +2,8 @@
 #include "Image.h"
 #include "TilemapTool.h"
 #include "StartScene.h"
+#include "HouseScene.h"
+#include "FarmScene.h"
 
 HRESULT MainGame::Init()
 {
@@ -21,8 +23,10 @@ HRESULT MainGame::Init()
 	// 키와 씬 저장
 	SceneManager::GetSingleton()->AddScene("타일맵툴", new TilemapTool());
 	SceneManager::GetSingleton()->AddScene("시작씬", new StartScene());
+	SceneManager::GetSingleton()->AddScene("하우스씬", new HouseScene());
+	SceneManager::GetSingleton()->AddScene("농장씬", new FarmScene());
 
-	// 시작 씬 -> 인게임은 *3배로 키워서 출력하자
+	// 시작 씬 -> 인게임은 x배로 키워서 출력하자
 	//SceneManager::GetSingleton()->ChangeScene("타일맵툴");
 	SceneManager::GetSingleton()->ChangeScene("시작씬");
 
