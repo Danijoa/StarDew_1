@@ -2,13 +2,16 @@
 #include "GameNode.h"
 
 class Image;
+class HouseScene;
 class Player : public GameNode
 {
 private:
-	// 기본 
+	//
 	Image* player;
 	FPOINT pos;
+	FPOINT imagePos;
 	FPOINT playerFuturePos;
+	INT_RECTINDEX playerRectIndex;
 	RECT playerRect;
 	INT_PAIR playerIndex;
 	float moveSpeed;
@@ -22,11 +25,11 @@ private:
 	INT_RECTINDEX playerFutureRectIndex;
 	RECT playerFutureRect;
 
-	// 집 타일 정보
-	TILE_INFO* houseTileInfo;
-
 	// 현재 씬
-	int sceneNum;
+	INT_PAIR curImageSize;
+
+	//
+	char szText[128] = "";
 
 public:
 	virtual HRESULT Init();
@@ -37,11 +40,26 @@ public:
 	void SetFuture(FPOINT playerFuturePos);
 	void Move();
 
-	// 하우스 맵 타일 정보
-	inline void SetHouseTileInfo(TILE_INFO* houseTileInfo) { this->houseTileInfo = houseTileInfo; }
+	// 위치
+	inline void SetPlayerImagePos(FPOINT pos) { this->imagePos = pos; }
+	inline FPOINT GetPlayerImagePos() { return this->imagePos; }
+	inline void SetPlayerPos(FPOINT pos) { this->pos = pos; }
+	inline FPOINT GetPlayerPos() { return this->pos; }
+	inline RECT GetPlayerRect() { return this->playerRect; }
 
-	// 신 번호
-	inline void SetSceneNum(int sceneNum) { this->sceneNum = sceneNum; }
+	// 예측 렉트 인덱스
+	inline RECT GetPlayerFutureRect() { return this->playerFutureRect; }
+	inline INT_RECTINDEX GetPlayerFutureRectIndex() { return this->playerFutureRectIndex; }
+	inline INT_RECTINDEX GetPlayerCurrRectIndex() { return this->playerRectIndex; }
+
+	// 맵 타일 정보
+	inline void SetCurrImageSize(INT_PAIR size) { this->curImageSize = size; }
+
+	// 이동
+	inline void SetCanMove(bool move) { this->canMove = move; }
+
+	// 방향
+	inline void SetStartFrameIndex(INT_PAIR frameIndex) { this->frameIndex = frameIndex; }
 
 	virtual ~Player() {};
 };

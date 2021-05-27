@@ -1,9 +1,6 @@
 #pragma once
 #include "GameNode.h"
 
-#define SAMPLE_TILE_X 4
-#define SAMPLE_TILE_Y 4
-
 class Image;
 class TilemapTool : public GameNode
 {
@@ -11,13 +8,16 @@ private:
 	// 메인 타일의 정보
 	static TILE_INFO houseTileInfo[HOUSE_TILE_X * HOUSE_TILE_Y];
 	static TILE_INFO farmTileInfo[FARM_TILE_X * FARM_TILE_Y];
+	static TILE_INFO storeTileInfo[STORE_TILE_X * STORE_TILE_Y];
+	static TILE_INFO tilesetTileInfo[SAMPLE_TILE_X * SAMPLE_TILE_Y];
 
 	// 샘플 타일 정보
-	Image* houseSample;
+	Image* sample;
 	TILE_INFO sampleTileInfo[SAMPLE_TILE_X * SAMPLE_TILE_Y];
 
 	// 샘플 타일 선택
 	INT_PAIR ptSelectedFrame;
+	INT_PAIR ptSelectedFrameShow;
 	HBRUSH hSelectedBrush;
 	HBRUSH hOldSelectedBrush;
 

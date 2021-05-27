@@ -10,7 +10,7 @@ class KeyManager : public Singleton<KeyManager>
 private:
 	bitset<MAX_KEY_COUNT>	keyUp;		// 현재 키가 위로 올라와 있는지
 	bitset<MAX_KEY_COUNT>	keyDown;	// 현재 키가 눌려 있는지
-
+	
 public:
 	HRESULT Init();
 	void Release();

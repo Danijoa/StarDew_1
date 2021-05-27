@@ -81,13 +81,18 @@ public:
 	// 정적 이미지 출력
 	void Render(HDC hdc, int destX = 0, int destY = 0,
 		bool isCenterRenderring = false);
-	// 동적 이미지 출력
-	void FrameRender(HDC hdc, int destX, int destY,
-		int currFrameX, int currFrameY, bool isCenterRenderring = false, int size = 1);
+	// 정적(높이 변화) 이미지 출력
+	void BarRender(HDC hdc, int destX = 0, int destY = 0, int height = 0);
 	// 정적 이미지에 알파블랜드 적용하여 출력
 	void AlphaRender(HDC hdc, int destX, int destY,
 		bool isCenterRenderring = false);
-
+	// 동적(프레임) 이미지 출력
+	void FrameRender(HDC hdc, int destX, int destY,
+		int currFrameX, int currFrameY, bool isCenterRenderring = false, int size = 1);
+	// 동적(프레임 별 높이 변화) 이미지 출력
+	void FrameListRender(HDC hdc, int destX, int destY, 
+		int tempHeight, int tempCopyY,
+		int currFrameX, int currFrameY);
 
 	void Release();
 

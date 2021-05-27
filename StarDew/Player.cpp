@@ -1,12 +1,10 @@
 #include "Player.h"
 #include "Image.h"
 #include "CollisionCheck.h"
+#include "InventoryManager.h"
 
 HRESULT Player::Init()
 {
-	// 집 타일
-	houseTileInfo = new TILE_INFO();
-
 	// 플레이어 이미지
 	ImageManager::GetSingleton()->AddImage("플레이어이미지", "Image/GreyCat.bmp", 128 * 3, 256 * 3, 4, 8, true, RGB(255, 255, 255));
 	player = ImageManager::GetSingleton()->FindImage("플레이어이미지");
@@ -19,11 +17,11 @@ HRESULT Player::Init()
 	playerRect = { (LONG)pos.x , (LONG)pos.y, (LONG)(pos.x + TILESIZE) , (LONG)(pos.y + TILESIZE) };
 
 	// 플레이어 타일 인덱스
-	playerIndex.x = pos.x / TILESIZE;
-	playerIndex.y = pos.y / TILESIZE;
+	//playerIndex.x = pos.x / TILESIZE;
+	//playerIndex.y = pos.y / TILESIZE;
 
 	// 플레이어 속도
-	moveSpeed = 200.0f;
+	moveSpeed = 250.0f;
 	
 	// 플레이어 방향
 	playerDir = 1;	// 하(아래)바라봄
@@ -47,29 +45,33 @@ void Player::Release()
 
 void Player::Update()
 {
-	// 플레이어 발 위치
-	playerRect = { (LONG)(pos.x + 25) , (LONG)(pos.y + 35), (LONG)(pos.x + 25 + TILESIZE * 0.7) , (LONG)(pos.y + 35 + TILESIZE * 0.7) };
-
-	// 플레이어 타일 인덱스
-	playerIndex.x = pos.x / TILESIZE;
-	playerIndex.y = pos.y / TILESIZE;
+	// 플레이어 위치 잡기
+	pos.x = WINSIZE_X / 2;
+	pos.y = WINSIZE_Y / 2;
+	if (imagePos.x < WINSIZE_X / 2)
+		pos.x = imagePos.x;
+	if (imagePos.x > curImageSize.x - WINSIZE_X / 2)
+		pos.x = imagePos.x - curImageSize.x + WINSIZE_X;
+	if (imagePos.y < WINSIZE_Y / 2)
+		pos.y = imagePos.y;
+	if (imagePos.y > curImageSize.y - WINSIZE_Y / 2)
+		pos.y = imagePos.y - curImageSize.y + WINSIZE_Y;
+	
+	// 플레이어 발 위치 렉트 + 인덱스
+	playerRect = { (LONG)(pos.x + 30) , (LONG)(pos.y + 45), (LONG)(pos.x + 30 + TILESIZE) , (LONG)(pos.y + 45 + TILESIZE) };
 
 	// 움직임
-	Move();
+	if (!InventoryManager::GetSingleton()->GetBigOpened())
+		Move();
+
+	// 인벤토리 업데이트
+	InventoryManager::GetSingleton()->Update();
 }
 
 void Player::SetFuture(FPOINT playerFuturePos)
 {
-	playerFutureRect = { (LONG)(playerFuturePos.x + 25) , (LONG)(playerFuturePos.y + 35),
-		(LONG)(playerFuturePos.x + 25 + (TILESIZE * 0.7)) , (LONG)(playerFuturePos.y + 35 + (TILESIZE * 0.7)) };
-
-	if (sceneNum == 1)	// 집
-	{
-		playerFutureRectIndex = { (int)(playerFutureRect.left - 300) / TILESIZE,
-		   (int)(playerFutureRect.top + 45) / TILESIZE,
-		   (int)(playerFutureRect.right - 300) / TILESIZE,
-		   (int)(playerFutureRect.bottom + 45) / TILESIZE };
-	}
+	playerFutureRect = { (LONG)(playerFuturePos.x + 30) , (LONG)(playerFuturePos.y + 45),
+		(LONG)(playerFuturePos.x + 30 + (TILESIZE * 0.5)) , (LONG)(playerFuturePos.y + 45 + (TILESIZE * 0.5)) };
 }
 
 void Player::Move()
@@ -85,26 +87,12 @@ void Player::Move()
 		if (frameIndex.x == 3)
 			frameIndex.x = 0;
 
-		// 위치 예측
-		playerFuturePos = { pos.x, pos.y - moveSpeed * TimerManager::GetSingleton()->GetElapsedTime() };
-		SetFuture(playerFuturePos);
-
-		// 충돌체크
-		canMove = true;
-		if (houseTileInfo[playerFutureRectIndex.leftIndex
-			+ playerFutureRectIndex.topIndex * HOUSE_TILE_X].tileType == TileType::WALL)	// left,top
-		{
-			canMove = false;
-		}
-		if(houseTileInfo[playerFutureRectIndex.rightIndex
-			+ playerFutureRectIndex.topIndex * HOUSE_TILE_X].tileType == TileType::WALL)	// right,top
-		{
-			canMove = false;
-		}
+		// 예측
+		SetFuture({ pos.x, pos.y - moveSpeed * TimerManager::GetSingleton()->GetElapsedTime() });
 
 		// 움직임
-		if(canMove)
-			pos.y -= moveSpeed * TimerManager::GetSingleton()->GetElapsedTime();
+		if (canMove)
+			imagePos = {imagePos.x, imagePos.y - moveSpeed * TimerManager::GetSingleton()->GetElapsedTime() };
 	}
 	else if (KeyManager::GetSingleton()->IsStayKeyDown('S'))	// 하
 	{
@@ -115,24 +103,10 @@ void Player::Move()
 		if (frameIndex.x == 3)
 			frameIndex.x = 0;
 
-		playerFuturePos = { pos.x, pos.y + moveSpeed * TimerManager::GetSingleton()->GetElapsedTime() };
-		SetFuture(playerFuturePos);
+		SetFuture({ pos.x, pos.y + moveSpeed * TimerManager::GetSingleton()->GetElapsedTime() });
 
-		// 충돌체크
-		canMove = true;
-		if (houseTileInfo[playerFutureRectIndex.leftIndex
-			+ playerFutureRectIndex.bottomIndex * HOUSE_TILE_X].tileType == TileType::WALL)	// left,bottom
-		{
-			canMove = false;
-		}
-		if (houseTileInfo[playerFutureRectIndex.rightIndex
-			+ playerFutureRectIndex.bottomIndex * HOUSE_TILE_X].tileType == TileType::WALL)	// right,bottom
-		{
-			canMove = false;
-		}
-
-		if(canMove)
-			pos.y += moveSpeed * TimerManager::GetSingleton()->GetElapsedTime();
+		if (canMove)
+			imagePos = { imagePos.x, imagePos.y + moveSpeed * TimerManager::GetSingleton()->GetElapsedTime() };
 	}
 	else if (KeyManager::GetSingleton()->IsStayKeyDown('A'))	// 좌
 	{
@@ -143,24 +117,10 @@ void Player::Move()
 		if (frameIndex.x == 3)
 			frameIndex.x = 0;
 
-		playerFuturePos = { pos.x - moveSpeed * TimerManager::GetSingleton()->GetElapsedTime() , pos.y };
-		SetFuture(playerFuturePos);
+		SetFuture({ pos.x - moveSpeed * TimerManager::GetSingleton()->GetElapsedTime(), pos.y });
 
-		// 충돌체크
-		canMove = true;
-		if (houseTileInfo[playerFutureRectIndex.leftIndex
-			+ playerFutureRectIndex.topIndex * HOUSE_TILE_X].tileType == TileType::WALL)	// left,top
-		{
-			canMove = false;
-		}
-		if (houseTileInfo[playerFutureRectIndex.leftIndex
-			+ playerFutureRectIndex.bottomIndex * HOUSE_TILE_X].tileType == TileType::WALL)	// left,bottom
-		{
-			canMove = false;
-		}
-		
 		if (canMove)
-			pos.x -= moveSpeed * TimerManager::GetSingleton()->GetElapsedTime();
+			imagePos = { imagePos.x - moveSpeed * TimerManager::GetSingleton()->GetElapsedTime(), imagePos.y };
 	}
 	else if (KeyManager::GetSingleton()->IsStayKeyDown('D'))	// 우
 	{
@@ -171,33 +131,19 @@ void Player::Move()
 		if (frameIndex.x == 3)
 			frameIndex.x = 0;
 
-		playerFuturePos = { pos.x + moveSpeed * TimerManager::GetSingleton()->GetElapsedTime() , pos.y };
-		SetFuture(playerFuturePos);
-
-		// 충돌체크
-		canMove = true;
-		if (houseTileInfo[playerFutureRectIndex.rightIndex
-			+ playerFutureRectIndex.topIndex * HOUSE_TILE_X].tileType == TileType::WALL)	// right,top
-		{
-			canMove = false;
-		}
-		if (houseTileInfo[playerFutureRectIndex.rightIndex
-			+ playerFutureRectIndex.bottomIndex * HOUSE_TILE_X].tileType == TileType::WALL)	// right,bottom
-		{
-			canMove = false;
-		}
+		SetFuture({ pos.x + moveSpeed * TimerManager::GetSingleton()->GetElapsedTime(), pos.y });
 
 		if (canMove)
-			pos.x += moveSpeed * TimerManager::GetSingleton()->GetElapsedTime();
+			imagePos = { imagePos.x + moveSpeed * TimerManager::GetSingleton()->GetElapsedTime(), imagePos.y };
 	}
-
 }
 
 void Player::Render(HDC hdc)
 {
 	if (player)
-	{
-		Rectangle(hdc, playerRect.left, playerRect.top, playerRect.right, playerRect.bottom);
+	{		
 		player->FrameRender(hdc, pos.x, pos.y, frameIndex.x, frameIndex.y);
+		Rectangle(hdc, playerRect.left, playerRect.top , playerRect.right, playerRect.bottom);
+		InventoryManager::GetSingleton()->Render(hdc);
 	}
 }

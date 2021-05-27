@@ -147,6 +147,68 @@ void Image::Render(HDC hdc, int destX, int destY, bool isCenterRenderring)
 
 }
 
+// 정적
+void Image::BarRender(HDC hdc, int destX, int destY, int height)
+{
+	int x = destX;
+	int y = destY;
+
+	// bitmap 에 있는 이미지 정보를 다른 비트맵에 복사
+	BitBlt(
+		hdc,                                                // 복사 목적지 DC
+		x, y + (imageInfo->height - height),                // 복사 시작 위치(윈도우 상)
+		imageInfo->width,                                   // 원본에서 복사될 가로크기
+		height,                                             // 원본에서 복사될 세로크기
+		imageInfo->hMemDC,                                  // 원본 DC
+		0, 0,                                               // 원본에서 복사 시작 위치
+		SRCCOPY                                             // 복사 옵션
+	);
+}
+
+//알파
+void Image::AlphaRender(HDC hdc, int destX, int destY, bool isCenterRenderring)
+{
+    int x = destX;
+    int y = destY;
+    if (isCenterRenderring)
+    {
+        x = destX - (imageInfo->width / 2);
+        y = destY - (imageInfo->height / 2);
+    }
+
+    // 원본DC(hdc)에 그려져 있는 내용(배경)을 (비어져 있는 임시) BlendDC에 복사
+    BitBlt(
+        imageInfo->hBlendDC,                 // 복사 목적지 DC
+        0, 0,                                // 복사 시작 위치
+        imageInfo->width,                    // 원본에서 복사될 가로크기
+        imageInfo->height,                   // 원본에서 복사될 세로크기
+        hdc,                                 // 원본 DC
+        x, y,                                // 원본에서 복사 시작 위치
+        SRCCOPY                              // 복사 옵션
+    );
+
+    // 출력할 이미지 hMemDC의 내용(우주선 이미지)을 지정한 색상(마젠타)을 제외하면서 BlendDC에 복사
+    GdiTransparentBlt(
+        imageInfo->hBlendDC,
+        0, 0,
+        imageInfo->width, imageInfo->height,
+        imageInfo->hMemDC,
+        0, 0,
+        imageInfo->width, imageInfo->height,
+        transColor
+    );
+
+    // BlendDC를 원본DC(hdc)에 그려주는 과정에서 알파블랜드 적용시키기
+    AlphaBlend(
+        hdc,
+        x, y,
+        imageInfo->width, imageInfo->height,
+        imageInfo->hBlendDC,
+        0, 0,
+        imageInfo->width, imageInfo->height,
+        blendFunc);
+}
+
 // 동적
 void Image::FrameRender(HDC hdc, int destX, int destY,
     int currFrameX, int currFrameY, bool isCenterRenderring, int size)
@@ -208,47 +270,31 @@ void Image::FrameRender(HDC hdc, int destX, int destY,
     }
 }
 
-void Image::AlphaRender(HDC hdc, int destX, int destY, bool isCenterRenderring)
+// 동적
+void Image::FrameListRender(HDC hdc, int destX, int destY, 
+    int tempHeight, int tempCopyY, 
+    int currFrameX, int currFrameY)
 {
+    imageInfo->currFrameX = currFrameX;
+    imageInfo->currFrameY = currFrameY;
+
     int x = destX;
     int y = destY;
-    if (isCenterRenderring)
-    {
-        x = destX - (imageInfo->width / 2);
-        y = destY - (imageInfo->height / 2);
-    }
 
-    // 원본DC(hdc)에 그려져 있는 내용(배경)을 (비어져 있는 임시) BlendDC에 복사
-    BitBlt(
-        imageInfo->hBlendDC,                 // 복사 목적지 DC
-        0, 0,                                // 복사 시작 위치
-        imageInfo->width,                    // 원본에서 복사될 가로크기
-        imageInfo->height,                   // 원본에서 복사될 세로크기
-        hdc,                                 // 원본 DC
-        x, y,                                // 원본에서 복사 시작 위치
-        SRCCOPY                              // 복사 옵션
-    );
+	BitBlt(
+		hdc,
+		x, y,
 
-    // 출력할 이미지 hMemDC의 내용(우주선 이미지)을 지정한 색상(마젠타)을 제외하면서 BlendDC에 복사
-    GdiTransparentBlt(
-        imageInfo->hBlendDC,
-        0, 0,
-        imageInfo->width, imageInfo->height,
-        imageInfo->hMemDC,
-        0, 0,
-        imageInfo->width, imageInfo->height,
-        transColor
-    );
+		imageInfo->frameWidth,
+		tempHeight,
 
-    // BlendDC를 원본DC(hdc)에 그려주는 과정에서 알파블랜드 적용시키기
-    AlphaBlend(
-        hdc,
-        x, y,
-        imageInfo->width, imageInfo->height,
-        imageInfo->hBlendDC,
-        0, 0,
-        imageInfo->width, imageInfo->height,
-        blendFunc);
+		imageInfo->hMemDC,
+
+		imageInfo->frameWidth * imageInfo->currFrameX,
+		imageInfo->frameHeight * imageInfo->currFrameY + tempCopyY,
+
+		SRCCOPY
+	);
 }
 
 void Image::Release()

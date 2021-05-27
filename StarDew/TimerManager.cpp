@@ -5,6 +5,7 @@ HRESULT TimerManager::Init()
 {
     timer = new Timer();
     timer->Init();
+    gameSecond = 0;
 
     return S_OK;
 }
@@ -19,6 +20,7 @@ void TimerManager::Update()
     if (timer)
     {
         timer->Tick();
+        gameSecond = timer->getGameSecond();
     }
 }
 
@@ -27,7 +29,10 @@ void TimerManager::Render(HDC hdc)
     if (timer)
     {
         wsprintf(szText, "FPS : %d", timer->GetFPS());
-        TextOut(hdc, WINSIZE_X - 150, 20, szText, strlen(szText));
+        TextOut(hdc, WINSIZE_X - 150, 180, szText, strlen(szText));
+
+        //wsprintf(szText, "시간 경과 : %d", gameSecond);
+        //TextOut(hdc, WINSIZE_X - 150, 195, szText, strlen(szText));
     }
 }
 
