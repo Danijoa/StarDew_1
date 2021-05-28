@@ -21,7 +21,7 @@ HRESULT Player::Init()
 	//playerIndex.y = pos.y / TILESIZE;
 
 	// 플레이어 속도
-	moveSpeed = 250.0f;
+	moveSpeed = 300.0f;
 	
 	// 플레이어 방향
 	playerDir = 1;	// 하(아래)바라봄
@@ -143,7 +143,7 @@ void Player::Render(HDC hdc)
 	if (player)
 	{		
 		player->FrameRender(hdc, pos.x, pos.y, frameIndex.x, frameIndex.y);
-		Rectangle(hdc, playerRect.left, playerRect.top , playerRect.right, playerRect.bottom);
+		//Rectangle(hdc, playerRect.left, playerRect.top , playerRect.right, playerRect.bottom);
 		InventoryManager::GetSingleton()->Render(hdc);
 	}
 }

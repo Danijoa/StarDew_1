@@ -149,6 +149,7 @@
     <ClCompile Include="ImageManager.cpp" />
     <ClCompile Include="InventoryManager.cpp" />
     <ClCompile Include="KeyManager.cpp" />
+    <ClCompile Include="LoadingScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainGame.cpp" />
     <ClCompile Include="Player.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="ImageManager.h" />
     <ClInclude Include="InventoryManager.h" />
     <ClInclude Include="KeyManager.h" />
+    <ClInclude Include="LoadingScene.h" />
     <ClInclude Include="MainGame.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SceneManager.h" />

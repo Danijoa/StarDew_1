@@ -22,6 +22,12 @@ private:
 	// 잠 들 것인가 확인
 	Image* sleepBox;
 	bool checkSleep;
+	bool yesSleep;
+	bool noSleep;
+
+	// 위치 알려주는 빨간 렉트
+	HPEN hpen;
+	HPEN hpenOld;
 
 	// 
 	int houseDir;

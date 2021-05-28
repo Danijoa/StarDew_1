@@ -8,6 +8,14 @@ TILE_INFO HouseScene::houseTileInfo[HOUSE_TILE_X * HOUSE_TILE_Y];
 
 HRESULT HouseScene::Init()
 {
+    if (DataManager::GetSingleton()->GetPreScene() == 1)
+    {
+        Sleep(1500);
+        InventoryManager::GetSingleton()->SetDay();             // day 갱신
+        InventoryManager::GetSingleton()->SetDayCheck(true);    // day 갱신 알려주기
+        InventoryManager::GetSingleton()->SetReEnergy();        // 체력 갱신
+    }
+
     // 크기 조정
     //SetClientRect(g_hWnd, WINSIZE_X, WINSIZE_Y);
 
@@ -20,8 +28,8 @@ HRESULT HouseScene::Init()
     // 플레이어
     player = new Player();
     player->Init();
-    if (DataManager::GetSingleton()->GetPreScene() == 0)    // 타이틀에서 전환된 장면 or 테스트
-        player->SetPlayerImagePos({ 300, 350 });
+    if (DataManager::GetSingleton()->GetPreScene() == 0 || DataManager::GetSingleton()->GetPreScene() == 1)    // 타이틀에서 전환된 장면 or 잠들고 일어난 경우
+        player->SetPlayerImagePos({ 320, 310 });
     if (DataManager::GetSingleton()->GetPreScene() == 2)    // 마당에서 전환된 장면
         player->SetPlayerImagePos({ 423, 550 });
     player->SetCurrImageSize({ houseSample->GetWidth(), houseSample->GetHeight() });
@@ -31,9 +39,11 @@ HRESULT HouseScene::Init()
     renderCoor.y = player->GetPlayerImagePos().y - WINSIZE_Y / 2;
 
     // 잠 확인
-    ImageManager::GetSingleton()->AddImage("잠박스", "Image/sleepBox.bmp", 184, 44, true, RGB(255, 255, 255));
+    ImageManager::GetSingleton()->AddImage("잠박스", "Image/sleepBox.bmp", 1277, 361, true, RGB(255, 255, 255));
     sleepBox = ImageManager::GetSingleton()->FindImage("잠박스");
     checkSleep = false;
+    yesSleep = false;
+    noSleep = false;
 
     //
     houseDir = 1;
@@ -61,14 +71,25 @@ void HouseScene::MoveControl()
 void HouseScene::Move()
 {
     if (KeyManager::GetSingleton()->IsStayKeyDown('W'))			// 상
+    {
         houseDir = 0;
+        playerHouseCollision();
+    }
     else if (KeyManager::GetSingleton()->IsStayKeyDown('S'))	// 하
+    {
         houseDir = 1;
+        playerHouseCollision();
+    }
     else if (KeyManager::GetSingleton()->IsStayKeyDown('A'))	// 좌
+    {
         houseDir = 2;
+        playerHouseCollision();
+    }
     else if (KeyManager::GetSingleton()->IsStayKeyDown('D'))	// 우
+    {
         houseDir = 3;
-    playerHouseCollision();
+        playerHouseCollision();
+    }
 }
 
 void HouseScene::playerHouseCollision()
@@ -102,7 +123,7 @@ void HouseScene::playerHouseCollision()
     case 2:
         // 잠들자
         if (player->GetPlayerRect().left > 320 && player->GetPlayerRect().left < 400
-            && player->GetPlayerRect().top > 330 && player->GetPlayerRect().top < 380)
+            && player->GetPlayerRect().top > 330 && player->GetPlayerRect().top < 400)
         {
             checkSleep = true;
         }
@@ -142,6 +163,40 @@ void HouseScene::Update()
     // 렌더 시작 인덱스
     startFrame.x = renderCoor.x / TILESIZE;
     startFrame.y = renderCoor.y / TILESIZE;
+
+    // 잠 들 것인가
+    if (checkSleep)
+    {
+        // 잘 거임
+        if (g_ptMouse.x > 80 && g_ptMouse.x < 1265 && g_ptMouse.y > 320 && g_ptMouse.y < 405)
+        {
+            if (KeyManager::GetSingleton()->IsOnceKeyDown(VK_LBUTTON))
+            {
+                yesSleep = true;
+                noSleep = false;
+
+                // 다음 날
+                checkSleep = false;
+		        DataManager::GetSingleton()->SetPreScene(1);        // 타이틀 씬에서 새로 로드 하는 것 처럼 저장
+                SceneManager::GetSingleton()->ChangeScene("하우스씬", "로딩씬");
+                return;
+            }
+        }
+
+        // 인 잘 거임
+        if (g_ptMouse.x > 80 && g_ptMouse.x < 1265 && g_ptMouse.y > 405 && g_ptMouse.y < 490)
+        {
+            if (KeyManager::GetSingleton()->IsOnceKeyDown(VK_LBUTTON))
+            {
+                yesSleep = false;
+                noSleep = true;
+
+                // 다시 활동
+                checkSleep = false;
+                player->SetCanMove(true);
+            }
+        }
+    }
 }
 
 void HouseScene::Render(HDC hdc)
@@ -178,18 +233,33 @@ void HouseScene::Render(HDC hdc)
 
     if (checkSleep)
     {
-        sleepBox->Render(hdc, WINSIZE_X / 2 - sleepBox->GetWidth() / 2, WINSIZE_Y - 100);
+        sleepBox->Render(hdc, WINSIZE_X / 2 - sleepBox->GetWidth() / 2, WINSIZE_Y / 2 - sleepBox->GetHeight() / 2);
         player->SetCanMove(false);
 
-        /*yes 누르면*/
-        //player->SetCanMove(true);
-        //InventoryManager::GetSingleton()->SetDay();         // day 갱신
-        //InventoryManager::GetSingleton()->SetReEnergy();    // 체력 갱신
-        //DataManager::GetSingleton()->SetPreScene(0);        // 타이틀 씬에서 새로 로드 하는 것 처럼 저장
-        //SceneManager::GetSingleton()->ChangeScene("하우스씬");
+        hpen = CreatePen(PS_SOLID, 3, RGB(255, 0, 0));
+        hpenOld = (HPEN)::SelectObject(hdc, (HGDIOBJ)hpen);
 
-        /*no 누르면*/
-        //player->SetCanMove(true);
+
+        if (g_ptMouse.x > 80 && g_ptMouse.x < 1265 && g_ptMouse.y > 320 && g_ptMouse.y < 405)
+        {
+            MoveToEx(hdc, 80, 320, NULL);
+            LineTo(hdc, 1265, 320);
+            LineTo(hdc, 1265, 405);
+            LineTo(hdc, 80, 405);
+            LineTo(hdc, 80, 320);
+        }
+
+        if (g_ptMouse.x > 80 && g_ptMouse.x < 1265 && g_ptMouse.y>405 && g_ptMouse.y < 490)
+        {
+            MoveToEx(hdc, 80, 405, NULL);
+            LineTo(hdc, 1265, 405);
+            LineTo(hdc, 1265, 490);
+            LineTo(hdc, 80, 490);
+            LineTo(hdc, 80, 405);
+        }
+
+        hpen = (HPEN)::SelectObject(hdc, hpenOld);
+        DeleteObject(hpen);
     }
 }
 

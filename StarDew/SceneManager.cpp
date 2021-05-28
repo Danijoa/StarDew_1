@@ -141,10 +141,10 @@ HRESULT SceneManager::ChangeScene(string sceneName, string loadingsceneName)
         return E_FAIL;
     }
 
-    if (it->second == currentScene)
-    {
-        return S_OK;
-    }
+    //if (it->second == currentScene)
+    //{
+    //    return S_OK;
+    //}
 
     // loading 씬 찾기
     map<string, GameNode*>::iterator itLoading
@@ -167,7 +167,7 @@ HRESULT SceneManager::ChangeScene(string sceneName, string loadingsceneName)
         currentScene = itLoading->second;
 
         readyScene = it->second;
-        loadingScene = itLoading->second;
+        loadingScene = itLoading->second;   // second 값이 GameNode*(씬)
 
         //다음 씬을 초기화 할 쓰레드를 생성
         DWORD loadingThreadId;

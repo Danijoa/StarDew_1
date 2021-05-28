@@ -29,7 +29,7 @@ void TimerManager::Render(HDC hdc)
     if (timer)
     {
         wsprintf(szText, "FPS : %d", timer->GetFPS());
-        TextOut(hdc, WINSIZE_X - 150, 180, szText, strlen(szText));
+        TextOut(hdc, 0, 0, szText, strlen(szText));
 
         //wsprintf(szText, "시간 경과 : %d", gameSecond);
         //TextOut(hdc, WINSIZE_X - 150, 195, szText, strlen(szText));

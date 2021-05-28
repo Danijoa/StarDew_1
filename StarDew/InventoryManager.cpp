@@ -65,6 +65,7 @@ HRESULT InventoryManager::Init()
     size = 64;
     tabCnt = 0;
     timeCheck = 0.0f;
+    checkDayPass = false;
 
     return S_OK;
 }
@@ -81,6 +82,8 @@ void InventoryManager::Update()
     // 날짜 흐름
     if (KeyManager::GetSingleton()->IsOnceKeyDown('P'))
     {
+        checkDayPass = true;
+
         dayCnt += 1;
         //timeCnt = 0;
         timeCheck = TimerManager::GetSingleton()->GetGameSecond();
@@ -361,12 +364,12 @@ void InventoryManager::Render(HDC hdc)
 	if (vInven[downIndex.x] == NULL)
 	{
 		wsprintf(szText, "선택 아이템: x ");
-		TextOut(hdc, 0, 0, szText, strlen(szText));
+		TextOut(hdc, 0, 30, szText, strlen(szText));
 	}
 	else
 	{
 		wsprintf(szText, "선택 아이템: %s ", vInven[downIndex.x]->productName.c_str());
-		TextOut(hdc, 0, 0, szText, strlen(szText));
+		TextOut(hdc, 0, 30, szText, strlen(szText));
 	}
 
     // 

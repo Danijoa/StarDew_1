@@ -49,6 +49,7 @@ public:
 	void testWater();
 	void testGrow();
 	void testHarvest();
+	void testDry();
 
 	void MoveControl();
 	void Move();

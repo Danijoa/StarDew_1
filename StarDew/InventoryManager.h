@@ -15,6 +15,7 @@ private:
 	int dayCnt;
 	int timeCnt;
 	int money;
+	bool checkDayPass;
 
 	// 체력
 	Image* energyBar;
@@ -106,6 +107,8 @@ public:
 	// 날짜
 	inline int GetDay() { return this->dayCnt; }
 	inline void SetDay() { this->dayCnt += 1; }
+	inline bool GetDayCheck() { return this->checkDayPass; }
+	inline void SetDayCheck(bool dayPass) { this->checkDayPass = dayPass; }
 
 	// 체력
 	inline void SetEnergy(int used) { this->playerEnergy -= used; }

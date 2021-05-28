@@ -7,6 +7,7 @@
 #include "StoreScene.h"
 #include "DataManager.h"
 #include "InventoryManager.h"
+#include "LoadingScene.h"
 
 HRESULT MainGame::Init()
 {
@@ -31,6 +32,7 @@ HRESULT MainGame::Init()
 	SceneManager::GetSingleton()->AddScene("ÇÏ¿ì½º¾À", new HouseScene());
 	SceneManager::GetSingleton()->AddScene("³óÀå¾À", new FarmScene());
 	SceneManager::GetSingleton()->AddScene("»óÁ¡¾À", new StoreScene());
+	SceneManager::GetSingleton()->AddLoadingScene("·Îµù¾À", new LoadingScene());
 
 	// ½ÃÀÛ ¾À -> ÀÎ°ÔÀÓÀº x¹è·Î Å°¿ö¼­ Ãâ·ÂÇÏÀÚ
 	//SceneManager::GetSingleton()->ChangeScene("Å¸ÀÏ¸ÊÅø");
@@ -68,7 +70,7 @@ void MainGame::Render()
 
 	// ¸¶¿ì½º ÁÂÇ¥
 	wsprintf(szText, "X : %d, Y : %d", g_ptMouse.x, g_ptMouse.y);
-	TextOut(hBackDC, 200, 20, szText, strlen(szText));
+	TextOut(hBackDC, 80, 0, szText, strlen(szText));
 
 	// FPS
 	TimerManager::GetSingleton()->Render(hBackDC);
