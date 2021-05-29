@@ -81,6 +81,8 @@ public:
 	// 정적 이미지 출력
 	void Render(HDC hdc, int destX = 0, int destY = 0,
 		bool isCenterRenderring = false);
+	// 정적 배경 머지 이미지 출력
+	void LightRender(HDC hdc, int destX = 0, int destY = 0);
 	// 정적(높이 변화) 이미지 출력
 	void BarRender(HDC hdc, int destX = 0, int destY = 0, int height = 0);
 	// 정적 이미지에 알파블랜드 적용하여 출력

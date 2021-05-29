@@ -40,8 +40,12 @@ HRESULT FarmScene::Init()
 	farmDir = 1;
 	canMove = true;
 
-	//
+	// 타일 정보 가져오기
 	farmTileInfo = DataManager::GetSingleton()->GetFarmScene();
+
+	// 빛
+	ImageManager::GetSingleton()->AddImage("빛", "Image/blackLight.bmp", WINSIZE_X, WINSIZE_Y);
+	light = ImageManager::GetSingleton()->FindImage("빛");
 
 	return S_OK;
 }
@@ -128,8 +132,7 @@ void FarmScene::playerFarmCollision()
 
 	player->SetCanMove(canMove);
 }
-
-/* (testDigUp, testWater) 두개 합쳐서 431줄.. */
+  
 void FarmScene::testDigUp()
 {
 	// 상 하 좌 우
@@ -677,13 +680,11 @@ void FarmScene::testHarvest()
 
 void FarmScene::testDry()
 {
-	for (int i = startFrame.y; i <= startFrame.y + WINSIZE_Y / F_TILESIZE + 1; i++)        // 세로
+	for (int i = 0; i <= FARM_TILE_Y; i++)        // 세로
 	{
-		for (int j = startFrame.x; j <= startFrame.x + WINSIZE_X / F_TILESIZE + 1; j++)    // 가로
+		for (int j = 0; j <= FARM_TILE_X; j++)    // 가로
 		{
 			int tempIndex = i * FARM_TILE_X + j;
-			int tempPosX = -((int)renderCoor.x % F_TILESIZE) + F_TILESIZE * (j - startFrame.x);
-			int tempPosY = -((int)renderCoor.y % F_TILESIZE) + F_TILESIZE * (i - startFrame.y);
 
 			// 물 준 곳
 			if (farmTileInfo[tempIndex].tileType == TileType::WETDIG)
@@ -861,13 +862,11 @@ void FarmScene::Update()
 	if (InventoryManager::GetSingleton()->GetDayCheck() == true)
 	{
 		// 물 뿌린 곳만 자라 날 수 있도록
-		for (int i = startFrame.y; i <= startFrame.y + WINSIZE_Y / F_TILESIZE + 1; i++)        // 세로
+		for (int i = 0; i <= FARM_TILE_Y; i++)        // 세로
 		{
-			for (int j = startFrame.x; j <= startFrame.x + WINSIZE_X / F_TILESIZE + 1; j++)    // 가로
+			for (int j = 0; j <= FARM_TILE_X; j++)    // 가로
 			{
 				int tempIndex = i * FARM_TILE_X + j;
-				int tempPosX = -((int)renderCoor.x % F_TILESIZE) + F_TILESIZE * (j - startFrame.x);
-				int tempPosY = -((int)renderCoor.y % F_TILESIZE) + F_TILESIZE * (i - startFrame.y);
 					
 				// 곡식
 				if (farmTileInfo[tempIndex].seedType == SeedType::CROP)
@@ -1014,6 +1013,11 @@ void FarmScene::Render(HDC hdc)
 		}
 	}
 
+	// 빛
+	HBRUSH testBrush = CreateSolidBrush(RGB(200, 200, 200));
+	HBRUSH testOldBrush = (HBRUSH)SelectObject(hdc, testBrush);
+	light->LightRender(hdc, 0, 0);
+
 	// 마우스 위치 땅
 	hpen = CreatePen(PS_DASH, 1, RGB(0, 0, 0));
 	hpenOld = (HPEN)::SelectObject(hdc, (HGDIOBJ)hpen);
@@ -1035,6 +1039,9 @@ void FarmScene::Render(HDC hdc)
 
 	hpen = (HPEN)::SelectObject(hdc, hpenOld);
 	DeleteObject(hpen);
+
+	// 인벤토리
+	InventoryManager::GetSingleton()->Render(hdc);
 
 	//wsprintf(szText, "winClicked.x: %d , winClicked.y: %d", winClicked.x, winClicked.y);
 	//TextOut(hdc, 0, 400, szText, strlen(szText));

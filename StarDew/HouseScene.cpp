@@ -8,9 +8,15 @@ TILE_INFO HouseScene::houseTileInfo[HOUSE_TILE_X * HOUSE_TILE_Y];
 
 HRESULT HouseScene::Init()
 {
-    if (DataManager::GetSingleton()->GetPreScene() == 1)
+    if (DataManager::GetSingleton()->GetPreScene() == 4)
     {
-        Sleep(1500);
+        Sleep(1500);    // 로딩 대기
+
+        // 잠들었는 방법 갱신
+        InventoryManager::GetSingleton()->SetSleepDay(false);   
+        InventoryManager::GetSingleton()->SetTimeoutDay(false);
+        InventoryManager::GetSingleton()->SetEnergyoutDay(false);
+
         InventoryManager::GetSingleton()->SetDay();             // day 갱신
         InventoryManager::GetSingleton()->SetDayCheck(true);    // day 갱신 알려주기
         InventoryManager::GetSingleton()->SetReEnergy();        // 체력 갱신
@@ -28,7 +34,7 @@ HRESULT HouseScene::Init()
     // 플레이어
     player = new Player();
     player->Init();
-    if (DataManager::GetSingleton()->GetPreScene() == 0 || DataManager::GetSingleton()->GetPreScene() == 1)    // 타이틀에서 전환된 장면 or 잠들고 일어난 경우
+    if (DataManager::GetSingleton()->GetPreScene() == 0 || DataManager::GetSingleton()->GetPreScene() == 4)    // 타이틀에서 전환된 장면 or 잠들고 일어난 경우
         player->SetPlayerImagePos({ 320, 310 });
     if (DataManager::GetSingleton()->GetPreScene() == 2)    // 마당에서 전환된 장면
         player->SetPlayerImagePos({ 423, 550 });
@@ -115,7 +121,7 @@ void HouseScene::playerHouseCollision()
             DataManager::GetSingleton()->SetPreScene(1); // 현재 씬(집=1) 저장
             SceneManager::GetSingleton()->ChangeScene("농장씬");
         }
-        if (houseTileInfo[left + bottom * HOUSE_TILE_X].tileType == TileType::WALL)	// left,bottom
+        if (houseTileInfo[left + bottom * HOUSE_TILE_X].tileType == TileType::WALL) 	// left,bottom
             canMove = false;
         if (houseTileInfo[right + bottom * HOUSE_TILE_X].tileType == TileType::WALL)	// right,bottom
             canMove = false;
@@ -133,10 +139,10 @@ void HouseScene::playerHouseCollision()
             canMove = false;
         break;
     case 3:
-        if (houseTileInfo[right + top * HOUSE_TILE_X].tileType == TileType::WALL)	// right,top
+        if (houseTileInfo[right + top * HOUSE_TILE_X].tileType == TileType::WALL)	    // right,top
             canMove = false;
         if (houseTileInfo[right + bottom * HOUSE_TILE_X].tileType == TileType::WALL)	// right,bottom
-            canMove = false;
+               canMove = false;
         break;
     default:
         break;
@@ -177,7 +183,9 @@ void HouseScene::Update()
 
                 // 다음 날
                 checkSleep = false;
-		        DataManager::GetSingleton()->SetPreScene(1);        // 타이틀 씬에서 새로 로드 하는 것 처럼 저장
+		        DataManager::GetSingleton()->SetPreScene(4);                    // 타이틀 씬에서 새로 로드 하는 것 처럼 저장
+                player->SetCanMove(true);
+                InventoryManager::GetSingleton()->SetSleepDay(true);            // 정상적으로 잠들었다
                 SceneManager::GetSingleton()->ChangeScene("하우스씬", "로딩씬");
                 return;
             }
@@ -261,6 +269,9 @@ void HouseScene::Render(HDC hdc)
         hpen = (HPEN)::SelectObject(hdc, hpenOld);
         DeleteObject(hpen);
     }
+
+    // 인벤토리
+    InventoryManager::GetSingleton()->Render(hdc);
 }
 
 void HouseScene::loadHouseScene(int sceneNum)

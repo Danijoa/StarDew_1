@@ -38,6 +38,7 @@ private:
 	int farmDir;
 	bool canMove;
 	char szText[128] = "";
+	Image* light;
 
 public:
 	virtual HRESULT Init();

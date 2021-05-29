@@ -37,8 +37,8 @@ HRESULT MainGame::Init()
 	// Ω√¿€ æ¿ -> ¿Œ∞‘¿”¿∫ xπË∑Œ ≈∞øˆº≠ √‚∑¬«œ¿⁄
 	//SceneManager::GetSingleton()->ChangeScene("≈∏¿œ∏ ≈¯");
 	//SceneManager::GetSingleton()->ChangeScene("Ω√¿€æ¿");
-	SceneManager::GetSingleton()->ChangeScene("«œøÏΩ∫æ¿");
-	//SceneManager::GetSingleton()->ChangeScene("≥Û¿Âæ¿");
+	//SceneManager::GetSingleton()->ChangeScene("«œøÏΩ∫æ¿");
+	SceneManager::GetSingleton()->ChangeScene("≥Û¿Âæ¿");
 	//SceneManager::GetSingleton()->ChangeScene("ªÛ¡°æ¿");
 
 	return S_OK;

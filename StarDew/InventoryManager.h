@@ -10,12 +10,21 @@ class SortManager;
 class InventoryManager : public Singleton<InventoryManager>
 {
 private:
+	// 폰트
+	Image* numFont;
+	Image* dayFont;
+
 	// 시계
 	Image* clock;
 	int dayCnt;
 	int timeCnt;
 	int money;
 	bool checkDayPass;
+
+	// 다음날
+	bool sleepDay;
+	bool timeoutDay;
+	bool energyoutDay;
 
 	// 체력
 	Image* energyBar;
@@ -43,7 +52,6 @@ private:
 
 	// 곡물들
 	Image* crops;
-	Image* cropNum;
 
 	// 농사 툴
 	Image* tools;
@@ -77,6 +85,7 @@ public:
 	// 스크롤
 	inline void SetScrolledUp(bool up) { this->scrolledUp = up; }
 	inline bool GetScrolledUp() { return this->scrolledUp; }
+
 	inline void SetStoreListOpen(bool opened) { this->storeOpened = opened; }
 
 	inline void SetScrolledDown(bool down) { this->scrolledDown = down; }
@@ -107,12 +116,23 @@ public:
 	// 날짜
 	inline int GetDay() { return this->dayCnt; }
 	inline void SetDay() { this->dayCnt += 1; }
+
 	inline bool GetDayCheck() { return this->checkDayPass; }
 	inline void SetDayCheck(bool dayPass) { this->checkDayPass = dayPass; }
 
 	// 체력
 	inline void SetEnergy(int used) { this->playerEnergy -= used; }
 	inline void SetReEnergy() { this->playerEnergy = 213; }
+
+	// 다음날
+	inline void SetSleepDay(bool check) { this->sleepDay = check; }
+	inline bool GetSleepDay() { return this->sleepDay; }
+
+	inline void SetTimeoutDay(bool check) { this->timeoutDay = check; }
+	inline bool GetTimeoutDay() { return this->timeoutDay; }
+
+	inline void SetEnergyoutDay(bool check) { this->energyoutDay = check; }
+	inline bool GetEnergyoutDay() { return this->energyoutDay; }
 
 };
 

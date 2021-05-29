@@ -143,8 +143,24 @@ void Image::Render(HDC hdc, int destX, int destY, bool isCenterRenderring)
             SRCCOPY             // 복사 옵션
         );
     }
+}
 
-
+//
+void Image::LightRender(HDC hdc, int destX, int destY)
+{
+    int x = destX;
+    int y = destY;
+     
+	// bitmap 에 있는 이미지 정보를 다른 비트맵에 복사
+	BitBlt(
+		hdc,                    // 복사 목적지 DC
+		x, y,                   // 복사 시작 위치(윈도우 상)
+		imageInfo->width,       // 원본에서 복사될 가로크기
+		imageInfo->height,      // 원본에서 복사될 세로크기
+		imageInfo->hMemDC,      // 원본 DC
+		0, 0,                   // 원본에서 복사 시작 위치
+        MERGECOPY               // 복사 옵션 : 소스 비트맵과 대상 화면을 AND 연산한다 (MERGEPAINT : 소스 비트맵과 대상 화면을 OR 연산한다)
+	);
 }
 
 // 정적

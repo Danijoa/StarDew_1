@@ -1,6 +1,8 @@
 #include "InventoryManager.h"
 #include "Image.h"
 #include "SortManager.h"
+#include "DataManager.h"
+#include <math.h>
 
 SortManager InventoryManager::sortMgr;
 
@@ -46,9 +48,11 @@ HRESULT InventoryManager::Init()
     ImageManager::GetSingleton()->AddImage("농기구", "Image/tool(2).bmp", 16 * 3, 36 * 3, 1, 2, true, RGB(255, 255, 255));
     tools = ImageManager::GetSingleton()->FindImage("농기구");
 
-    // 숫자
+    // 폰트
     ImageManager::GetSingleton()->AddImage("숫자", "Image/font_num.bmp", 80, 11, 10, 1, true, RGB(255, 0, 255));
-    cropNum = ImageManager::GetSingleton()->FindImage("숫자");
+    numFont = ImageManager::GetSingleton()->FindImage("숫자");
+    ImageManager::GetSingleton()->AddImage("데이", "Image/dayFont.bmp", 25, 12, true, RGB(255, 255, 255));
+    dayFont = ImageManager::GetSingleton()->FindImage("데이");
 
     // 인벤토리 내용 저장   
     for (int i = 0; i < 36; i++)
@@ -66,6 +70,9 @@ HRESULT InventoryManager::Init()
     tabCnt = 0;
     timeCheck = 0.0f;
     checkDayPass = false;
+    sleepDay = false;
+    timeoutDay = false;
+    energyoutDay = false;
 
     return S_OK;
 }
@@ -83,16 +90,24 @@ void InventoryManager::Update()
     if (KeyManager::GetSingleton()->IsOnceKeyDown('P'))
     {
         checkDayPass = true;
-
         dayCnt += 1;
-        //timeCnt = 0;
         timeCheck = TimerManager::GetSingleton()->GetGameSecond();
+    }
+
+    /* 일단 강제로 막아두기*/ 
+    if (dayCnt >= 999)
+    {
+        dayCnt = 999;
     }
 
     // 체력
     if (playerEnergy <= 0)
     {
         playerEnergy = 0;
+
+        DataManager::GetSingleton()->SetPreScene(4);                    // 타이틀 씬에서 새로 로드 하는 것 처럼 저장
+        InventoryManager::GetSingleton()->SetEnergyoutDay(true);            // 에너지 아웃으로 잠들었다
+        SceneManager::GetSingleton()->ChangeScene("하우스씬", "로딩씬");
     }
 
     // 비어있는 인벤토리 위치 찾기
@@ -244,40 +259,61 @@ void InventoryManager::Render(HDC hdc)
 {
     // 시계
     if (clock)
-    {
         clock->Render(hdc, WINSIZE_X - clock->GetWidth(), 0);
+
+    // day
+    int dayHun = dayCnt / 100;
+    int dayTen = (dayCnt % 100) / 10;
+    int dayOne = dayCnt % 10;
+    if (dayFont)
+        dayFont->Render(hdc, WINSIZE_X - 70 - 30, 22);
+	// 100의 자리
+	if (dayHun > 0)
+		numFont->FrameRender(hdc, WINSIZE_X - 70, 22, dayHun, 0);
+	// 10의 자리
+	if (dayTen > 0 || dayHun > 0)
+		numFont->FrameRender(hdc, WINSIZE_X - 70 + 10, 22, dayTen, 0);
+	// 1의 자리
+	numFont->FrameRender(hdc, WINSIZE_X - 70 + 20, 22, dayOne, 0);
+
+    // time
+    wsprintf(szText, "Time : %d", timeCnt);
+    TextOut(hdc, WINSIZE_X - 100, 85, szText, strlen(szText));
+
+    // money
+    if (money <= 0)
+    {
+        numFont->FrameRender(hdc, WINSIZE_X - 33, 150, 0, 0);
+    }
+    else
+    {
+        int moneySize = 0;
+        int tempMoney = money;
+        while (tempMoney > 0)
+        {
+            tempMoney = tempMoney / 10;
+            moneySize++;
+        }
+
+        for (int i = 1; i < moneySize + 1; i++)
+        {
+            int a = pow(10, i);
+            int b = pow(10, (i - 1));
+            int curX = (money % a) / b;
+            numFont->FrameRender(hdc, WINSIZE_X - 33 - (18 * (i - 1)), 150, curX, 0);
+        }
     }
 
     // 체력
     if (energyBar)
-    {
         energyBar->Render(hdc, WINSIZE_X - energyBar->GetWidth()- 10, WINSIZE_Y - energyBar->GetHeight() - 10);
-    }
     if (energy)
-    {
         energy->BarRender(hdc, WINSIZE_X - energy->GetWidth() - 10 - 11, WINSIZE_Y - energy->GetHeight() - 10 - 6, playerEnergy);
-    }
 
     // 작은 인벤 창 출력 (12개)
     if (smallInvenOpened)
     {
         smallInven->Render(hdc, WINSIZE_X / 2 - smallInven->GetWidth() / 2, WINSIZE_Y - smallInven->GetHeight());
-
-       /* hpen = CreatePen(PS_SOLID, 3, RGB(0, 0, 255));
-        hpenOld = (HPEN)::SelectObject(hdc, (HGDIOBJ)hpen);
-
-        if (g_ptMouse.y > smallRect.top && g_ptMouse.y < smallRect.bottom
-            && g_ptMouse.x > smallRect.left && g_ptMouse.x < smallRect.right)
-        {
-            MoveToEx(hdc, 290 + size * sInvenX, 645, NULL);
-            LineTo(hdc, 290 + size * (sInvenX + 1), 645);
-            LineTo(hdc, 290 + size * (sInvenX + 1), 645 + size);
-            LineTo(hdc, 290 + size * sInvenX, 645 + size);
-            LineTo(hdc, 290 + size * sInvenX, 645);
-        }
-
-        hpen = (HPEN)::SelectObject(hdc, hpenOld);
-        DeleteObject(hpen);*/
 
         // 작은 인벤 내용 출력
         for (int i = 0; i < 12; i++)
@@ -292,7 +328,9 @@ void InventoryManager::Render(HDC hdc)
             {
                 crops->FrameRender(hdc, objPosX, objPosY, vInven[i]->frameX, vInven[i]->frameY);
                 // 숫자
-                cropNum->FrameRender(hdc, objPosX + 45, objPosY + 45, vInven[i]->amount, 0);
+                numFont->FrameRender(hdc, objPosX + 45, objPosY + 45, (vInven[i]->amount % 10), 0);
+                if(vInven[i]->amount >= 10)
+                    numFont->FrameRender(hdc, objPosX + 45 - 10, objPosY + 45, (vInven[i]->amount / 10), 0);
             }
             else if (vInven[i]->objType == ObjectType::TOOLS)
             {
@@ -351,7 +389,9 @@ void InventoryManager::Render(HDC hdc)
             {
                 crops->FrameRender(hdc, objPosX, objPosY, vInven[i]->frameX, vInven[i]->frameY);
                 // 숫자
-                cropNum->FrameRender(hdc, objPosX + 45, objPosY + 45, vInven[i]->amount, 0);
+                numFont->FrameRender(hdc, objPosX + 45, objPosY + 45, (vInven[i]->amount % 10), 0);
+                if (vInven[i]->amount >= 10)
+                    numFont->FrameRender(hdc, objPosX + 45 - 10, objPosY + 45, (vInven[i]->amount / 10), 0);
             }
             else if (vInven[i]->objType == ObjectType::TOOLS)
             {
@@ -371,16 +411,4 @@ void InventoryManager::Render(HDC hdc)
 		wsprintf(szText, "선택 아이템: %s ", vInven[downIndex.x]->productName.c_str());
 		TextOut(hdc, 0, 30, szText, strlen(szText));
 	}
-
-    // 
-    wsprintf(szText, "Day : %d", dayCnt);
-    TextOut(hdc, WINSIZE_X - 100, 20, szText, strlen(szText));
-
-    // 
-    wsprintf(szText, "Time : %d", timeCnt);
-    TextOut(hdc, WINSIZE_X - 100, 85, szText, strlen(szText));
-
-    // 
-    wsprintf(szText, "Money : %d", money);
-    TextOut(hdc, WINSIZE_X - 135, 145, szText, strlen(szText));
 }

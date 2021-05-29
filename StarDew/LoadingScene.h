@@ -7,6 +7,10 @@ class LoadingScene : public GameNode
 private:
 	Image* loadImage;
 
+	Image* sleepFont;
+	Image* timeoutFont;
+	Image* energyoutFont;
+
 public:
 	virtual HRESULT Init();
 	virtual void Release();

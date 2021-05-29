@@ -6,7 +6,7 @@ TILE_INFO DataManager::farmTileInfo[FARM_TILE_X * FARM_TILE_Y];
 
 HRESULT DataManager::Init()
 {
-    // 0:시작 1:집 2:마당 3:상점
+    // 0:시작 1:집 2:마당 3:상점 4: 로딩
     preScene = 0;
 
     // 농장 타일 로드

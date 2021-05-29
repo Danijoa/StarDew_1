@@ -292,6 +292,7 @@ void StoreScene::Update()
 			renderListCoor = 0;
 			listIndex = 0;
 			listOpen = false;
+            InventoryManager::GetSingleton()->SetStoreListOpen(false);
 		}
     }
 
@@ -406,6 +407,9 @@ void StoreScene::Render(HDC hdc)
             }
         }
     }
+
+    // 인벤토리
+    InventoryManager::GetSingleton()->Render(hdc);
 }
 
 void StoreScene::loadStoreScene(int sceneNum)

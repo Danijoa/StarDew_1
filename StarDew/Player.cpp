@@ -144,6 +144,6 @@ void Player::Render(HDC hdc)
 	{		
 		player->FrameRender(hdc, pos.x, pos.y, frameIndex.x, frameIndex.y);
 		//Rectangle(hdc, playerRect.left, playerRect.top , playerRect.right, playerRect.bottom);
-		InventoryManager::GetSingleton()->Render(hdc);
+		//InventoryManager::GetSingleton()->Render(hdc);
 	}
 }
