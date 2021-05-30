@@ -1013,10 +1013,23 @@ void FarmScene::Render(HDC hdc)
 		}
 	}
 
+
 	// ºû
-	HBRUSH testBrush = CreateSolidBrush(RGB(200, 200, 200));
-	HBRUSH testOldBrush = (HBRUSH)SelectObject(hdc, testBrush);
-	light->LightRender(hdc, 0, 0);
+	//HDC test_hdc = light->GetMemDC();
+	//HBRUSH testBrush = CreateSolidBrush(RGB(250, 250, 250));
+	//HBRUSH testOldBrush = (HBRUSH)SelectObject(hdc, testBrush);
+	//light->LightRender(test_hdc, 0, 0);
+	//light->LightRender(hdc, 0, 0);
+	//testBrush = (HBRUSH)SelectObject(hdc, testOldBrush);
+	//DeleteObject(testBrush);
+
+	// ºû + ¹é¹öÆÛ
+	//HBRUSH testBrush_ = (HBRUSH)light;
+	//HBRUSH testOldBrush_ = (HBRUSH)SelectObject(hdc, testBrush_);
+	//DataManager::GetSingleton()->GetCurBackBuffer()->LightRender(hdc, 0, 0);
+	//testBrush_ = (HBRUSH)SelectObject(hdc, testOldBrush_);
+	//DeleteObject(testBrush_);
+
 
 	// ¸¶¿ì½º À§Ä¡ ¶¥
 	hpen = CreatePen(PS_DASH, 1, RGB(0, 0, 0));
@@ -1042,10 +1055,4 @@ void FarmScene::Render(HDC hdc)
 
 	// ÀÎº¥Åä¸®
 	InventoryManager::GetSingleton()->Render(hdc);
-
-	//wsprintf(szText, "winClicked.x: %d , winClicked.y: %d", winClicked.x, winClicked.y);
-	//TextOut(hdc, 0, 400, szText, strlen(szText));
-
-	//wsprintf(szText, "farmClicked.x: %d , farmClicked.y: %d", farmClicked.x, farmClicked.y);
-	//TextOut(hdc, 0, 500, szText, strlen(szText));
 }

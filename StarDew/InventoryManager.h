@@ -1,6 +1,6 @@
 #pragma once
 #include "config.h"
-#include "Singleton.h"
+#include "Singleton.h" 
 
 enum class ToolType {};
 enum class CropType {};
@@ -13,15 +13,24 @@ private:
 	// 폰트
 	Image* numFont;
 	Image* dayFont;
+	Image* timeDot;
 
 	// 시계
 	Image* clock;
-	int dayCnt;
+	Image* timeArrow;
 	int timeCnt;
+	int timeHour;
+	int timeMin;
+	float tempTime;
+	int timeControl;
+	float angle;
+
+	// 돈
 	int money;
-	bool checkDayPass;
 
 	// 다음날
+	int dayCnt;
+	bool checkDayPass;
 	bool sleepDay;
 	bool timeoutDay;
 	bool energyoutDay;
@@ -119,6 +128,12 @@ public:
 
 	inline bool GetDayCheck() { return this->checkDayPass; }
 	inline void SetDayCheck(bool dayPass) { this->checkDayPass = dayPass; }
+
+	inline void SetReTime() {
+		this->timeHour = 9;
+		this->timeMin = 0;
+		this->angle = 0.0f;
+	}
 
 	// 체력
 	inline void SetEnergy(int used) { this->playerEnergy -= used; }

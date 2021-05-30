@@ -20,6 +20,7 @@ HRESULT HouseScene::Init()
         InventoryManager::GetSingleton()->SetDay();             // day 갱신
         InventoryManager::GetSingleton()->SetDayCheck(true);    // day 갱신 알려주기
         InventoryManager::GetSingleton()->SetReEnergy();        // 체력 갱신
+        InventoryManager::GetSingleton()->SetReTime();          // 시간 갱신
     }
 
     // 크기 조정

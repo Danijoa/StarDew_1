@@ -47,7 +47,7 @@ HRESULT Image::Init(const char* fileName, int width, int height,
     // 알파 블랜드 dc 
     imageInfo->hBlendDC = CreateCompatibleDC(hdc);
     imageInfo->hBlendBit = CreateCompatibleBitmap(hdc,
-        imageInfo->width, imageInfo->height);
+        imageInfo->width*2, imageInfo->height*2);
     imageInfo->hOldBlendBit = (HBITMAP)SelectObject(imageInfo->hBlendDC,
         imageInfo->hBlendBit);
 
@@ -181,7 +181,7 @@ void Image::BarRender(HDC hdc, int destX, int destY, int height)
 	);
 }
 
-//알파
+// 알파
 void Image::AlphaRender(HDC hdc, int destX, int destY, bool isCenterRenderring)
 {
     int x = destX;
@@ -311,6 +311,45 @@ void Image::FrameListRender(HDC hdc, int destX, int destY,
 
 		SRCCOPY
 	);
+}
+
+// 회전
+void Image::RotateRender(HDC hdc, int destX, int destY, int len, float angle)
+{
+    POINT* myPoint;          //CONST
+    myPoint = new POINT();
+    myPoint[0].x = (LONG)(len + cosf((135 + angle) * PI / 180.0f) * (len * sqrt(2))); // 왼쪽 상단
+    myPoint[0].y = (LONG)(len - sinf((135 + angle) * PI / 180.0f) * (len * sqrt(2)));
+    myPoint[1].x = (LONG)(len + cosf((45 + angle) * PI / 180.0f) * (len * sqrt(2)));  // 오른쪽 상단
+    myPoint[1].y = (LONG)(len - sinf((45 + angle) * PI / 180.0f) * (len * sqrt(2)));
+    myPoint[2].x = (LONG)(len + cosf((225 + angle) * PI / 180.0f) * (len * sqrt(2))); // 왼쪽 하단
+    myPoint[2].y = (LONG)(len - sinf((225 + angle) * PI / 180.0f) * (len * sqrt(2)));
+ 
+    int x = destX;
+    int y = destY;
+
+    // 돌리기
+    PlgBlt(
+        imageInfo->hBlendDC,                // 복사 목적지 DC
+        myPoint,            // 변환된 꼭지점
+        imageInfo->hMemDC,  // 원본 DC
+        0, 0,               // 원본에서 복사 시작 위치
+        imageInfo->width*2,   // 복사 가로 크기
+        imageInfo->height*2,  // 복사 세로 크기
+        NULL, NULL, NULL
+    );
+
+    // 투명화
+    GdiTransparentBlt(
+        hdc,                                            // 목적지 DC
+        x, y,                                           // 복사 위치
+        imageInfo->width*2,
+        imageInfo->height*2,                              // 복사 크기
+        imageInfo->hBlendDC,                              // 원본 DC
+        0, 0,
+        imageInfo->width*2, imageInfo->height*2,
+        transColor                                      // 제외할 색상
+    );
 }
 
 void Image::Release()

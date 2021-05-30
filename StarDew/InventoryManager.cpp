@@ -12,8 +12,11 @@ HRESULT InventoryManager::Init()
     ImageManager::GetSingleton()->AddImage("시계", "Image/Clock.bmp", 71 * 3, 59 * 3, true, RGB(255, 0, 255));
     clock = ImageManager::GetSingleton()->FindImage("시계");
     dayCnt = 1;
-    timeCnt = TimerManager::GetSingleton()->GetGameSecond();
+    //timeCnt = TimerManager::GetSingleton()->GetGameSecond();
     money = 1000;
+    ImageManager::GetSingleton()->AddImage("시계화살표", "Image/timeArrow.bmp", 23, 47, true, RGB(255, 255, 255));
+    timeArrow = ImageManager::GetSingleton()->FindImage("시계화살표");
+    angle = 0.0f;
 
     // 체력
     ImageManager::GetSingleton()->AddImage("에너지바", "Image/energyBar.bmp", 45, 268, true, RGB(255, 255, 255));
@@ -53,6 +56,8 @@ HRESULT InventoryManager::Init()
     numFont = ImageManager::GetSingleton()->FindImage("숫자");
     ImageManager::GetSingleton()->AddImage("데이", "Image/dayFont.bmp", 25, 12, true, RGB(255, 255, 255));
     dayFont = ImageManager::GetSingleton()->FindImage("데이");
+    ImageManager::GetSingleton()->AddImage("날짜도트", "Image/timeDot.bmp", 7, 12, true, RGB(255, 255, 255));
+    timeDot = ImageManager::GetSingleton()->FindImage("날짜도트");
 
     // 인벤토리 내용 저장   
     for (int i = 0; i < 36; i++)
@@ -73,6 +78,10 @@ HRESULT InventoryManager::Init()
     sleepDay = false;
     timeoutDay = false;
     energyoutDay = false;
+    tempTime = 0.0f;
+    timeControl = 0;
+    timeHour = 9;
+    timeMin = 0;
 
     return S_OK;
 }
@@ -84,21 +93,45 @@ void InventoryManager::Release()
 void InventoryManager::Update()
 {
     // 시간 흐름
-    timeCnt = TimerManager::GetSingleton()->GetGameSecond() -timeCheck;
+    tempTime += TimerManager::GetSingleton()->GetElapsedTime();
+    if (tempTime >= 1.0f) 
+    {
+        angle += 0.6;
+        tempTime = 0.0f;
+        timeMin += 3;
+    }
+
+    if (timeMin > 60)
+    {
+        timeHour += 1;
+        timeMin = 0;
+    }
+
+    if (KeyManager::GetSingleton()->IsStayKeyDown('O'))
+    {
+        angle += 0.6;
+        timeMin += 3;
+    }
+
+    if (timeHour >= 24) //다음날
+    {
+        DataManager::GetSingleton()->SetPreScene(4);                    // 타이틀 씬에서 새로 로드 하는 것 처럼 저장
+        InventoryManager::GetSingleton()->SetTimeoutDay(true);            // 에너지 아웃으로 잠들었다
+        SceneManager::GetSingleton()->ChangeScene("하우스씬", "로딩씬");
+    }
 
     // 날짜 흐름
     if (KeyManager::GetSingleton()->IsOnceKeyDown('P'))
     {
         checkDayPass = true;
-        dayCnt += 1;
-        timeCheck = TimerManager::GetSingleton()->GetGameSecond();
+        SetDay();
+        SetReEnergy();
+        SetReTime();
     }
 
     /* 일단 강제로 막아두기*/ 
     if (dayCnt >= 999)
-    {
         dayCnt = 999;
-    }
 
     // 체력
     if (playerEnergy <= 0)
@@ -261,7 +294,10 @@ void InventoryManager::Render(HDC hdc)
     if (clock)
         clock->Render(hdc, WINSIZE_X - clock->GetWidth(), 0);
 
-    // day
+    // 초시계 화살표
+    timeArrow->RotateRender(hdc, 600, 200,  25, angle);
+
+    // day 날짜
     int dayHun = dayCnt / 100;
     int dayTen = (dayCnt % 100) / 10;
     int dayOne = dayCnt % 10;
@@ -276,11 +312,14 @@ void InventoryManager::Render(HDC hdc)
 	// 1의 자리
 	numFont->FrameRender(hdc, WINSIZE_X - 70 + 20, 22, dayOne, 0);
 
-    // time
-    wsprintf(szText, "Time : %d", timeCnt);
-    TextOut(hdc, WINSIZE_X - 100, 85, szText, strlen(szText));
+    // time 시간
+    numFont->FrameRender(hdc, WINSIZE_X - 100 - 20, 85, timeHour / 10, 0);
+    numFont->FrameRender(hdc, WINSIZE_X - 100 - 10, 85, timeHour % 10, 0);
+    timeDot->Render(hdc, WINSIZE_X - 100, 85);
+    numFont->FrameRender(hdc, WINSIZE_X - 100 + 10, 85, timeMin / 10, 0);
+    numFont->FrameRender(hdc, WINSIZE_X - 100 + 20, 85, timeMin % 10, 0);
 
-    // money
+    // money 돈
     if (money <= 0)
     {
         numFont->FrameRender(hdc, WINSIZE_X - 33, 150, 0, 0);

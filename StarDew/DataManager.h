@@ -15,6 +15,8 @@ private:
 	/* 확인용 */
 	char szText[128] = "";
 
+	Image* curBackBuffer;
+
 public:
 	HRESULT Init();
 	void Release();
@@ -26,5 +28,9 @@ public:
 	// 농장 씬 로드
 	void loadFarmScene(int sceneNum);
 	TILE_INFO* GetFarmScene() { return farmTileInfo; }
+
+	// 현재 백버퍼에 그려진 이미지
+	inline void SetCurBackBuffer(Image* backBuffer) { this->curBackBuffer = backBuffer; }
+	inline Image* GetCurBackBuffer() { return this->curBackBuffer; }
 };
 

@@ -95,6 +95,8 @@ public:
 	void FrameListRender(HDC hdc, int destX, int destY, 
 		int tempHeight, int tempCopyY,
 		int currFrameX, int currFrameY);
+	// 동적(회전) 이미지 출력
+	void RotateRender(HDC hdc, int destX, int destY, int len, float angle);
 
 	void Release();
 

@@ -60,6 +60,7 @@ void MainGame::Release()
 void MainGame::Update()
 {
 	SceneManager::GetSingleton()->Update();
+	DataManager::GetSingleton()->SetCurBackBuffer(backBuffer);
 }
 
 void MainGame::Render()
