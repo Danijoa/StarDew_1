@@ -20,6 +20,9 @@ private:
 public:
 	HRESULT Init();
 	void Release();
+	void Update();
+
+	void testDry();
 	
 	// ¾À
 	void SetPreScene(int pre) { this->preScene = pre; }

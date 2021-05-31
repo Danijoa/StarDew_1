@@ -4,7 +4,7 @@
 HRESULT StoreData::Init()
 {
 	// 곡물 정보
-	ImageManager::GetSingleton()->AddImage("상품정보", "Image/cropData.bmp", 2430, 254, 9, 1, true, RGB(0, 0, 0));
+	ImageManager::GetSingleton()->AddImage("상품정보", "Image/cropData.bmp", 1620, 169, 9, 1, true, RGB(0, 0, 0));
 	cropData = ImageManager::GetSingleton()->FindImage("상품정보");
 
 	// 정보 셋팅

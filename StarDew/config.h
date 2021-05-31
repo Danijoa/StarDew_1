@@ -101,15 +101,17 @@ typedef struct myIven
 	int frameX;
 	int frameY;
 	int orderNum;	// АЁАн
+	int salePrice;
 	string productName;
 	int amount;
 
-	myIven(ObjectType objType, int frameX, int frameY, int orderNum, string productName, int amount)
+	myIven(ObjectType objType, int frameX, int frameY, int orderNum, int salePrice, string productName, int amount)
 	{
 		this->objType = objType;
 		this->frameX = frameX;
 		this->frameY = frameY;
 		this->orderNum = orderNum;
+		this->salePrice = salePrice;
 		this->productName = productName;
 		this->amount = amount;
 	};

@@ -12,6 +12,9 @@ HRESULT HouseScene::Init()
     {
         Sleep(1500);    // 로딩 대기
 
+        // 땅 마르기
+        DataManager::GetSingleton()->Update();
+
         // 잠들었는 방법 갱신
         InventoryManager::GetSingleton()->SetSleepDay(false);   
         InventoryManager::GetSingleton()->SetTimeoutDay(false);

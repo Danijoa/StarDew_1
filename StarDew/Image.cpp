@@ -35,11 +35,13 @@ HRESULT Image::Init(const char* fileName, int width, int height,
 
     imageInfo = new IMAGE_INFO();
     imageInfo->resID = 0;
+
     imageInfo->hMemDC = CreateCompatibleDC(hdc);
     imageInfo->hBitmap =
         (HBITMAP)LoadImage(g_hInstance, fileName, IMAGE_BITMAP, width, height, LR_LOADFROMFILE);
     imageInfo->hOldBit =
         (HBITMAP)SelectObject(imageInfo->hMemDC, imageInfo->hBitmap);
+
     imageInfo->width = width;
     imageInfo->height = height;
     imageInfo->loadType = IMAGE_LOAD_KIND::FILE;
@@ -50,6 +52,17 @@ HRESULT Image::Init(const char* fileName, int width, int height,
         imageInfo->width*2, imageInfo->height*2);
     imageInfo->hOldBlendBit = (HBITMAP)SelectObject(imageInfo->hBlendDC,
         imageInfo->hBlendBit);
+
+    // 회전 dc 
+    imageInfo->hRotDC = CreateCompatibleDC(hdc);
+    imageInfo->hRotBit = CreateCompatibleBitmap(hdc, imageInfo->width * 2.5, imageInfo->height * 2.5);
+    imageInfo->hOldRotBit = (HBITMAP)SelectObject(imageInfo->hRotDC, imageInfo->hRotBit);
+
+    imageInfo->hResetDC = CreateCompatibleDC(hdc);
+    imageInfo->hResetBit = CreateCompatibleBitmap(hdc, imageInfo->width * 2.5, imageInfo->height * 2.5);
+    imageInfo->hOldResetBit = (HBITMAP)SelectObject(imageInfo->hResetDC, imageInfo->hResetBit);
+
+    myPoint = new POINT();
 
     ReleaseDC(g_hWnd, hdc);
 
@@ -226,8 +239,7 @@ void Image::AlphaRender(HDC hdc, int destX, int destY, bool isCenterRenderring)
 }
 
 // 동적
-void Image::FrameRender(HDC hdc, int destX, int destY,
-    int currFrameX, int currFrameY, bool isCenterRenderring, int size)
+void Image::FrameRender(HDC hdc, int destX, int destY, int currFrameX, int currFrameY, bool isCenterRenderring, int size)
 {
     imageInfo->currFrameX = currFrameX;
     imageInfo->currFrameY = currFrameY;
@@ -287,9 +299,7 @@ void Image::FrameRender(HDC hdc, int destX, int destY,
 }
 
 // 동적
-void Image::FrameListRender(HDC hdc, int destX, int destY, 
-    int tempHeight, int tempCopyY, 
-    int currFrameX, int currFrameY)
+void Image::FrameListRender(HDC hdc, int destX, int destY, int tempHeight, int tempCopyY, int currFrameX, int currFrameY)
 {
     imageInfo->currFrameX = currFrameX;
     imageInfo->currFrameY = currFrameY;
@@ -314,28 +324,30 @@ void Image::FrameListRender(HDC hdc, int destX, int destY,
 }
 
 // 회전
-void Image::RotateRender(HDC hdc, int destX, int destY, int len, float angle)
+void Image::RotateRender(HDC hdc, int destX, int destY, float len, float angle)
 {
-    POINT* myPoint;          //CONST
-    myPoint = new POINT();
-    myPoint[0].x = (LONG)(len + cosf((135 + angle) * PI / 180.0f) * (len * sqrt(2))); // 왼쪽 상단
-    myPoint[0].y = (LONG)(len - sinf((135 + angle) * PI / 180.0f) * (len * sqrt(2)));
-    myPoint[1].x = (LONG)(len + cosf((45 + angle) * PI / 180.0f) * (len * sqrt(2)));  // 오른쪽 상단
-    myPoint[1].y = (LONG)(len - sinf((45 + angle) * PI / 180.0f) * (len * sqrt(2)));
-    myPoint[2].x = (LONG)(len + cosf((225 + angle) * PI / 180.0f) * (len * sqrt(2))); // 왼쪽 하단
-    myPoint[2].y = (LONG)(len - sinf((225 + angle) * PI / 180.0f) * (len * sqrt(2)));
+    len += 0.5f;
+
+    //POINT* myPoint;          //CONST
+    //myPoint = new POINT();
+    myPoint[0].x = (LONG)(len + cosf((135.0f + angle) * PI / 180.0f) * (len * sqrt(2))); // 왼쪽 상단
+    myPoint[0].y = (LONG)(len - sinf((135.0f + angle) * PI / 180.0f) * (len * sqrt(2)));
+    myPoint[1].x = (LONG)(len + cosf((45.0f + angle) * PI / 180.0f) * (len * sqrt(2)));  // 오른쪽 상단
+    myPoint[1].y = (LONG)(len - sinf((45.0f + angle) * PI / 180.0f) * (len * sqrt(2)));
+    myPoint[2].x = (LONG)(len + cosf((225.0f + angle) * PI / 180.0f) * (len * sqrt(2))); // 왼쪽 하단
+    myPoint[2].y = (LONG)(len - sinf((225.0f + angle) * PI / 180.0f) * (len * sqrt(2)));
  
     int x = destX;
     int y = destY;
 
     // 돌리기
     PlgBlt(
-        imageInfo->hBlendDC,                // 복사 목적지 DC
-        myPoint,            // 변환된 꼭지점
-        imageInfo->hMemDC,  // 원본 DC
-        0, 0,               // 원본에서 복사 시작 위치
-        imageInfo->width*2,   // 복사 가로 크기
-        imageInfo->height*2,  // 복사 세로 크기
+        imageInfo->hRotDC,                  // 회전 이미지 저장할 복사 목적지 DC
+        myPoint,                            // 변환된 꼭지점
+        imageInfo->hMemDC,                  // 화살표 이미지 DC
+        0, 0,                               // 원본에서 복사 시작 위치
+        imageInfo->width,                   // 복사 가로 크기
+        imageInfo->height,                  // 복사 세로 크기
         NULL, NULL, NULL
     );
 
@@ -343,13 +355,25 @@ void Image::RotateRender(HDC hdc, int destX, int destY, int len, float angle)
     GdiTransparentBlt(
         hdc,                                            // 목적지 DC
         x, y,                                           // 복사 위치
-        imageInfo->width*2,
-        imageInfo->height*2,                              // 복사 크기
-        imageInfo->hBlendDC,                              // 원본 DC
+        imageInfo->width * 2.5,
+        imageInfo->height * 2.5,                        // 복사 크기
+        imageInfo->hRotDC,                              // 원본 DC
         0, 0,
-        imageInfo->width*2, imageInfo->height*2,
+        imageInfo->width, 
+        imageInfo->height,
         transColor                                      // 제외할 색상
     );
+
+    //// 지워주기
+    //BitBlt(
+    //    imageInfo->hRotDC,
+    //    0, 0, 
+    //    imageInfo->width * 2.5,
+    //    imageInfo->height * 2.5,
+    //    imageInfo->hResetDC,
+    //    x, y, 
+    //    SRCCOPY); 
+
 }
 
 void Image::Release()
@@ -370,4 +394,6 @@ void Image::Release()
         delete imageInfo;
         imageInfo = nullptr;
     }
+
+    delete[] myPoint;
 }

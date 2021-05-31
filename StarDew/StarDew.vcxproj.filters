@@ -105,6 +105,9 @@
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="PondMake.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="config.h">
@@ -178,6 +181,9 @@
     </ClInclude>
     <ClInclude Include="LoadingScene.h">
       <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="PondMake.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

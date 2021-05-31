@@ -133,6 +133,7 @@ void FarmScene::playerFarmCollision()
 	player->SetCanMove(canMove);
 }
   
+/* 농사 부분 550 줄임.. */
 void FarmScene::testDigUp()
 {
 	// 상 하 좌 우
@@ -667,7 +668,7 @@ void FarmScene::testHarvest()
 		{
 			// 새로생성
 			int price = storeData->GetMapCropData()->find(mapKey)->second->price * 2;
-			InventoryManager::GetSingleton()->SetAddInven(new INVEN_INFO(ObjectType::CROPGROWN, 1, mapKey, price, cropName, 1));
+			InventoryManager::GetSingleton()->SetAddInven(new INVEN_INFO(ObjectType::CROPGROWN, 1, mapKey, 0, price, cropName, 1));
 		}
 		// 있다
 		else
@@ -678,148 +679,25 @@ void FarmScene::testHarvest()
 	}
 }
 
-void FarmScene::testDry()
+void FarmScene::testSale()
 {
-	for (int i = 0; i <= FARM_TILE_Y; i++)        // 세로
+	// 인벤토리 벤터 정보 가져오기 + 선택한 인덱스 위치
+	vector<INVEN_INFO*>* vInven = InventoryManager::GetSingleton()->GetVectorInven();
+	int selectedIndex = InventoryManager::GetSingleton()->GetSelectedIndex();
+
+	// 찬매 할 수 있는 상품이면
+	if ((*vInven)[InventoryManager::GetSingleton()->GetSelectedIndex()]->salePrice != 0)
 	{
-		for (int j = 0; j <= FARM_TILE_X; j++)    // 가로
+		// 판매한 곡식 가격 겟
+		int price = (*vInven)[InventoryManager::GetSingleton()->GetSelectedIndex()]->salePrice;
+		InventoryManager::GetSingleton()->SetPlayerMoneyIncrease(price);
+
+		// 판매한 곡식 개수 삭제
+		(*vInven)[InventoryManager::GetSingleton()->GetSelectedIndex()]->amount -= 1;
+		if ((*vInven)[InventoryManager::GetSingleton()->GetSelectedIndex()]->amount <= 0)
 		{
-			int tempIndex = i * FARM_TILE_X + j;
-
-			// 물 준 곳
-			if (farmTileInfo[tempIndex].tileType == TileType::WETDIG)
-			{
-				// 건조
-				farmTileInfo[tempIndex].tileType = TileType::DIG;
-
-				// 혼자
-				if (farmTileInfo[tempIndex].objFrameX == 0 &&
-					farmTileInfo[tempIndex].objFrameY == 5)
-				{
-					farmTileInfo[tempIndex].objFrameX = 0;
-					farmTileInfo[tempIndex].objFrameY = 2;
-				}
-
-				// 상
-				if (farmTileInfo[tempIndex].objFrameX == 2 &&
-					farmTileInfo[tempIndex].objFrameY == 6)
-				{
-					farmTileInfo[tempIndex].objFrameX = 2;
-					farmTileInfo[tempIndex].objFrameY = 3;
-				}
-
-				// 하
-				if (farmTileInfo[tempIndex].objFrameX == 0 &&
-					farmTileInfo[tempIndex].objFrameY == 6)
-				{
-					farmTileInfo[tempIndex].objFrameX = 0;
-					farmTileInfo[tempIndex].objFrameY = 3;
-				}
-
-				// 좌
-				if (farmTileInfo[tempIndex].objFrameX == 3 &&
-					farmTileInfo[tempIndex].objFrameY == 6)
-				{
-					farmTileInfo[tempIndex].objFrameX = 3;
-					farmTileInfo[tempIndex].objFrameY = 3;
-				}
-
-				// 우
-				if (farmTileInfo[tempIndex].objFrameX == 1 &&
-					farmTileInfo[tempIndex].objFrameY == 6)
-				{
-					farmTileInfo[tempIndex].objFrameX = 1;
-					farmTileInfo[tempIndex].objFrameY = 3;
-				}
-
-				// 상 하
-				if (farmTileInfo[tempIndex].objFrameX == 1 &&
-					farmTileInfo[tempIndex].objFrameY == 5)
-				{
-					farmTileInfo[tempIndex].objFrameX = 1;
-					farmTileInfo[tempIndex].objFrameY = 2;
-				}
-
-				// 좌 우
-				if (farmTileInfo[tempIndex].objFrameX == 2 &&
-					farmTileInfo[tempIndex].objFrameY == 5)
-				{
-					farmTileInfo[tempIndex].objFrameX = 2;
-					farmTileInfo[tempIndex].objFrameY = 2;
-				}
-
-				// 상 우
-				if (farmTileInfo[tempIndex].objFrameX == 1 &&
-					farmTileInfo[tempIndex].objFrameY == 7)
-				{
-					farmTileInfo[tempIndex].objFrameX = 1;
-					farmTileInfo[tempIndex].objFrameY = 4;
-				}
-
-				// 상 좌
-				if (farmTileInfo[tempIndex].objFrameX == 2 &&
-					farmTileInfo[tempIndex].objFrameY == 7)
-				{
-					farmTileInfo[tempIndex].objFrameX = 2;
-					farmTileInfo[tempIndex].objFrameY = 4;
-				}
-
-				// 하 우
-				if (farmTileInfo[tempIndex].objFrameX == 0 &&
-					farmTileInfo[tempIndex].objFrameY == 7)
-				{
-					farmTileInfo[tempIndex].objFrameX = 0;
-					farmTileInfo[tempIndex].objFrameY = 4;
-				}
-
-				// 하 좌
-				if (farmTileInfo[tempIndex].objFrameX == 3 &&
-					farmTileInfo[tempIndex].objFrameY == 7)
-				{
-					farmTileInfo[tempIndex].objFrameX = 3;
-					farmTileInfo[tempIndex].objFrameY = 4;
-				}
-
-				// 상 우 하
-				if (farmTileInfo[tempIndex].objFrameX == 0 &&
-					farmTileInfo[tempIndex].objFrameY == 0)
-				{
-					farmTileInfo[tempIndex].objFrameX = 2;
-					farmTileInfo[tempIndex].objFrameY = 0;
-				}
-
-				// 상 우 좌
-				if (farmTileInfo[tempIndex].objFrameX == 2 &&
-					farmTileInfo[tempIndex].objFrameY == 1)
-				{
-					farmTileInfo[tempIndex].objFrameX = 3;
-					farmTileInfo[tempIndex].objFrameY = 2;
-				}
-
-				// 상 하 좌
-				if (farmTileInfo[tempIndex].objFrameX == 1 &&
-					farmTileInfo[tempIndex].objFrameY == 1)
-				{
-					farmTileInfo[tempIndex].objFrameX = 3;
-					farmTileInfo[tempIndex].objFrameY = 1;
-				}
-
-				// 하 우 좌
-				if (farmTileInfo[tempIndex].objFrameX == 1 &&
-					farmTileInfo[tempIndex].objFrameY == 0)
-				{
-					farmTileInfo[tempIndex].objFrameX = 3;
-					farmTileInfo[tempIndex].objFrameY = 0;
-				}
-
-				// 상 하 좌 우
-				if (farmTileInfo[tempIndex].objFrameX == 0 &&
-					farmTileInfo[tempIndex].objFrameY == 1)
-				{
-					farmTileInfo[tempIndex].objFrameX = 3;
-					farmTileInfo[tempIndex].objFrameY = 5;
-				}
-			}
+			// 0개면 해당값이 있던 벡터를 널로
+			(*vInven)[InventoryManager::GetSingleton()->GetSelectedIndex()] = NULL;
 		}
 	}
 }
@@ -849,43 +727,32 @@ void FarmScene::Update()
 		testDigUp();
 	else if (InventoryManager::GetSingleton()->GetSelectedItem().compare("Can") == 0)
 		testWater();
-	else if(InventoryManager::GetSingleton()->GetSeletecObjectType() == ObjectType::CROPS)
+	else if (InventoryManager::GetSingleton()->GetSeletecObjectType() == ObjectType::CROPS)
 		testGrow();
-	
-	// 수확
+
+	// 우 클릭 한 윈도우 상 위치가 
 	winClicked.x = -((int)renderCoor.x % F_TILESIZE) + F_TILESIZE * ((int)((g_ptMouse.x + renderCoor.x) / F_TILESIZE) - startFrame.x);
 	winClicked.y = -((int)renderCoor.y % F_TILESIZE) + F_TILESIZE * ((int)((g_ptMouse.y + renderCoor.y) / F_TILESIZE) - startFrame.y);
+
+	// 우 클릭 한 인덱스 위치가
+	farmClicked.x = (winClicked.x + renderCoor.x) / F_TILESIZE;
+	farmClicked.y = (winClicked.y + renderCoor.y) / F_TILESIZE;
+
 	if (KeyManager::GetSingleton()->IsOnceKeyDown(VK_RBUTTON))
-		testHarvest();
+	{
+		// 수확
+		if(farmTileInfo[farmClicked.x + FARM_TILE_X * farmClicked.y].seedType == SeedType::CROP)
+			testHarvest();
+		// 판매 -> CAVE 타일 안찍어 뒀다..
+		else if ((farmTileInfo[farmClicked.x + FARM_TILE_X * farmClicked.y].frameX == 25 && farmTileInfo[farmClicked.x + FARM_TILE_X * farmClicked.y].frameY == 4)
+			|| (farmTileInfo[farmClicked.x + FARM_TILE_X * farmClicked.y].frameX == 25 && farmTileInfo[farmClicked.x + FARM_TILE_X * farmClicked.y].frameY == 5)
+			|| (farmTileInfo[farmClicked.x + FARM_TILE_X * farmClicked.y].frameX == 26 && farmTileInfo[farmClicked.x + FARM_TILE_X * farmClicked.y].frameY == 4)
+			|| (farmTileInfo[farmClicked.x + FARM_TILE_X * farmClicked.y].frameX == 26 && farmTileInfo[farmClicked.x + FARM_TILE_X * farmClicked.y].frameY == 5))
+			testSale();
+	}
 
 	// 날짜가 흘렀으면
-	if (InventoryManager::GetSingleton()->GetDayCheck() == true)
-	{
-		// 물 뿌린 곳만 자라 날 수 있도록
-		for (int i = 0; i <= FARM_TILE_Y; i++)        // 세로
-		{
-			for (int j = 0; j <= FARM_TILE_X; j++)    // 가로
-			{
-				int tempIndex = i * FARM_TILE_X + j;
-					
-				// 곡식
-				if (farmTileInfo[tempIndex].seedType == SeedType::CROP)
-				{
-					// 물 줬니..?
-					if (farmTileInfo[tempIndex].tileType != TileType::WETDIG)
-					{
-						farmTileInfo[tempIndex].day += 1;
-					}
-				}
-			}
-		}
-		
-		// 땅 마르기
-		testDry();
-
-		// day 갱신 확인 완료
-		InventoryManager::GetSingleton()->SetDayCheck(false);
-	}
+	DataManager::GetSingleton()->Update();
 }
 
 void FarmScene::Render(HDC hdc)
@@ -1012,24 +879,6 @@ void FarmScene::Render(HDC hdc)
 			}
 		}
 	}
-
-
-	// 빛
-	//HDC test_hdc = light->GetMemDC();
-	//HBRUSH testBrush = CreateSolidBrush(RGB(250, 250, 250));
-	//HBRUSH testOldBrush = (HBRUSH)SelectObject(hdc, testBrush);
-	//light->LightRender(test_hdc, 0, 0);
-	//light->LightRender(hdc, 0, 0);
-	//testBrush = (HBRUSH)SelectObject(hdc, testOldBrush);
-	//DeleteObject(testBrush);
-
-	// 빛 + 백버퍼
-	//HBRUSH testBrush_ = (HBRUSH)light;
-	//HBRUSH testOldBrush_ = (HBRUSH)SelectObject(hdc, testBrush_);
-	//DataManager::GetSingleton()->GetCurBackBuffer()->LightRender(hdc, 0, 0);
-	//testBrush_ = (HBRUSH)SelectObject(hdc, testOldBrush_);
-	//DeleteObject(testBrush_);
-
 
 	// 마우스 위치 땅
 	hpen = CreatePen(PS_DASH, 1, RGB(0, 0, 0));

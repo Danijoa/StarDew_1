@@ -2,9 +2,6 @@
 #include "config.h"
 #include "Singleton.h" 
 
-enum class ToolType {};
-enum class CropType {};
-
 class Image;
 class SortManager;
 class InventoryManager : public Singleton<InventoryManager>
@@ -121,6 +118,7 @@ public:
 	// µ·
 	inline int GetPlayerMoney() { return this->money; }
 	inline void SetPlayerMoneyDecrease(int price) { this->money -= price; }
+	inline void SetPlayerMoneyIncrease(int price) { this->money += price; }
 
 	// ³¯Â¥
 	inline int GetDay() { return this->dayCnt; }

@@ -14,7 +14,7 @@ HRESULT InventoryManager::Init()
     dayCnt = 1;
     //timeCnt = TimerManager::GetSingleton()->GetGameSecond();
     money = 1000;
-    ImageManager::GetSingleton()->AddImage("시계화살표", "Image/timeArrow.bmp", 23, 47, true, RGB(255, 255, 255));
+    ImageManager::GetSingleton()->AddImage("시계화살표", "Image/timeArrow.bmp", 38, 38, true, RGB(255, 255, 255));
     timeArrow = ImageManager::GetSingleton()->FindImage("시계화살표");
     angle = 0.0f;
 
@@ -62,12 +62,12 @@ HRESULT InventoryManager::Init()
     // 인벤토리 내용 저장   
     for (int i = 0; i < 36; i++)
         vInven.push_back(NULL);
-    vInven[0] = (new INVEN_INFO(ObjectType::TOOLS, 0, 0, 0, "Can", 1));
-    vInven[1] = (new INVEN_INFO(ObjectType::TOOLS, 0, 1, 1, "Axe", 1));
-    vInven[2] = (new INVEN_INFO(ObjectType::CROPS, 0, 2, 100, "Rhubarb", 1));
-    vInven[3] = (new INVEN_INFO(ObjectType::CROPS, 0, 3, 80, "Blueberry", 1));
-    vInven[4] = (new INVEN_INFO(ObjectType::CROPS, 0, 4, 240, "Cranberries", 1));
-    vInven[5] = (new INVEN_INFO(ObjectType::CROPS, 0, 5, 200, "FairyRose", 1));
+    vInven[0] = (new INVEN_INFO(ObjectType::TOOLS, 0, 0, 0, 0, "Can", 1));
+    vInven[1] = (new INVEN_INFO(ObjectType::TOOLS, 0, 1, 0, 0, "Axe", 1));
+    vInven[2] = (new INVEN_INFO(ObjectType::CROPS, 0, 0, 20, 0, "Parsnip", 1));
+    vInven[3] = (new INVEN_INFO(ObjectType::CROPS, 0, 2, 100, 0, "Rhubarb", 1));
+    vInven[4] = (new INVEN_INFO(ObjectType::CROPS, 0, 3, 80, 0, "Blueberry", 1));
+    vInven[5] = (new INVEN_INFO(ObjectType::CROPS, 0, 7, 60, 0, "GreenBean", 1));
     vIndex = 6;
 
     //
@@ -96,7 +96,7 @@ void InventoryManager::Update()
     tempTime += TimerManager::GetSingleton()->GetElapsedTime();
     if (tempTime >= 1.0f) 
     {
-        angle += 0.6;
+        angle -= 0.6;
         tempTime = 0.0f;
         timeMin += 3;
     }
@@ -109,7 +109,7 @@ void InventoryManager::Update()
 
     if (KeyManager::GetSingleton()->IsStayKeyDown('O'))
     {
-        angle += 0.6;
+        angle -= 0.6;
         timeMin += 3;
     }
 
@@ -124,6 +124,7 @@ void InventoryManager::Update()
     if (KeyManager::GetSingleton()->IsOnceKeyDown('P'))
     {
         checkDayPass = true;
+        DataManager::GetSingleton()->Update();
         SetDay();
         SetReEnergy();
         SetReTime();
@@ -295,35 +296,18 @@ void InventoryManager::Render(HDC hdc)
         clock->Render(hdc, WINSIZE_X - clock->GetWidth(), 0);
 
     // 초시계 화살표
-    timeArrow->RotateRender(hdc, 600, 200,  25, angle);
-
-    // day 날짜
-    int dayHun = dayCnt / 100;
-    int dayTen = (dayCnt % 100) / 10;
-    int dayOne = dayCnt % 10;
-    if (dayFont)
-        dayFont->Render(hdc, WINSIZE_X - 70 - 30, 22);
-	// 100의 자리
-	if (dayHun > 0)
-		numFont->FrameRender(hdc, WINSIZE_X - 70, 22, dayHun, 0);
-	// 10의 자리
-	if (dayTen > 0 || dayHun > 0)
-		numFont->FrameRender(hdc, WINSIZE_X - 70 + 10, 22, dayTen, 0);
-	// 1의 자리
-	numFont->FrameRender(hdc, WINSIZE_X - 70 + 20, 22, dayOne, 0);
+    timeArrow->RotateRender(hdc, 1160, 10,  19.0f, angle);
 
     // time 시간
-    numFont->FrameRender(hdc, WINSIZE_X - 100 - 20, 85, timeHour / 10, 0);
-    numFont->FrameRender(hdc, WINSIZE_X - 100 - 10, 85, timeHour % 10, 0);
-    timeDot->Render(hdc, WINSIZE_X - 100, 85);
-    numFont->FrameRender(hdc, WINSIZE_X - 100 + 10, 85, timeMin / 10, 0);
-    numFont->FrameRender(hdc, WINSIZE_X - 100 + 20, 85, timeMin % 10, 0);
+    numFont->FrameRender(hdc, WINSIZE_X - 100, 90, timeHour / 10, 0);
+    numFont->FrameRender(hdc, WINSIZE_X - 90, 90, timeHour % 10, 0);
+    timeDot->Render(hdc, WINSIZE_X - 80, 90);
+    numFont->FrameRender(hdc, WINSIZE_X - 70, 90, timeMin / 10, 0);
+    numFont->FrameRender(hdc, WINSIZE_X - 60, 90, timeMin % 10, 0);
 
     // money 돈
     if (money <= 0)
-    {
         numFont->FrameRender(hdc, WINSIZE_X - 33, 150, 0, 0);
-    }
     else
     {
         int moneySize = 0;
@@ -342,6 +326,21 @@ void InventoryManager::Render(HDC hdc)
             numFont->FrameRender(hdc, WINSIZE_X - 33 - (18 * (i - 1)), 150, curX, 0);
         }
     }
+
+    // day 날짜
+    int dayHun = dayCnt / 100;
+    int dayTen = (dayCnt % 100) / 10;
+    int dayOne = dayCnt % 10;
+    if (dayFont)
+        dayFont->Render(hdc, WINSIZE_X - 70 - 30, 22);
+    // 100의 자리
+    if (dayHun > 0)
+        numFont->FrameRender(hdc, WINSIZE_X - 70, 22, dayHun, 0);
+    // 10의 자리
+    if (dayTen > 0 || dayHun > 0)
+        numFont->FrameRender(hdc, WINSIZE_X - 70 + 10, 22, dayTen, 0);
+    // 1의 자리
+    numFont->FrameRender(hdc, WINSIZE_X - 70 + 20, 22, dayOne, 0);
 
     // 체력
     if (energyBar)
@@ -449,5 +448,8 @@ void InventoryManager::Render(HDC hdc)
 	{
 		wsprintf(szText, "선택 아이템: %s ", vInven[downIndex.x]->productName.c_str());
 		TextOut(hdc, 0, 30, szText, strlen(szText));
+
+        wsprintf(szText, "판매 가격: %d ", vInven[downIndex.x]->salePrice);
+        TextOut(hdc, 0, 45, szText, strlen(szText));
 	}
 }

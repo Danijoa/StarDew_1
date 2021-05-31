@@ -69,6 +69,7 @@ void MainGame::Render()
 
 	SceneManager::GetSingleton()->Render(hBackDC);
 
+
 	// ¸¶¿ì½º ÁÂÇ¥
 	wsprintf(szText, "X : %d, Y : %d", g_ptMouse.x, g_ptMouse.y);
 	TextOut(hBackDC, 80, 0, szText, strlen(szText));
@@ -77,6 +78,13 @@ void MainGame::Render()
 	TimerManager::GetSingleton()->Render(hBackDC);
 
 	backBuffer->Render(hdc);
+
+	// ºû
+	//HBRUSH testBrush = CreateSolidBrush(RGB(90, 90, 90));
+	//HBRUSH testOldBrush = (HBRUSH)SelectObject(hdc, testBrush);
+	//backBuffer->LightRender(hdc, 0, 0);
+	//testBrush = (HBRUSH)SelectObject(hdc, testOldBrush);
+	//DeleteObject(testBrush);
 }
 
 LRESULT MainGame::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)

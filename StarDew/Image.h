@@ -27,6 +27,15 @@ public:
 		HBITMAP hBlendBit;
 		HBITMAP hOldBlendBit;
 
+		// 회전
+		HDC hRotDC;
+		HBITMAP hRotBit;
+		HBITMAP hOldRotBit;
+
+		HDC hResetDC;
+		HBITMAP hResetBit;
+		HBITMAP hOldResetBit;
+
 		// 애니메이션 관련 (프레임데이터)
 		int maxFrameX;
 		int maxFrameY;
@@ -57,6 +66,9 @@ public:
 			currFrameY = 0;
 		};
 	} IMAGE_INFO, * LPIMAGE_INFO;
+
+	// 회전 벡터
+	POINT* myPoint;          //CONST
 
 private:
 	IMAGE_INFO* imageInfo;		// 이미지 정보 구조체 포인터
@@ -96,7 +108,7 @@ public:
 		int tempHeight, int tempCopyY,
 		int currFrameX, int currFrameY);
 	// 동적(회전) 이미지 출력
-	void RotateRender(HDC hdc, int destX, int destY, int len, float angle);
+	void RotateRender(HDC hdc, int destX, int destY, float len, float angle);
 
 	void Release();
 

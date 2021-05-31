@@ -38,7 +38,7 @@ HRESULT StoreScene::Init()
     listBox = ImageManager::GetSingleton()->FindImage("리스트상자");
 
     // 돈 없어
-    ImageManager::GetSingleton()->AddImage("돈없어", "Image/moneyWarn.bmp", 160 * 3, 90 * 3, true, RGB(255, 255, 255));
+    ImageManager::GetSingleton()->AddImage("돈없어", "Image/moneyWarn.bmp", 480, 270, true, RGB(255, 255, 255));
     moneyWarn = ImageManager::GetSingleton()->FindImage("돈없어");
     noMoney = false;
     moneyTimeCnt = 0.0f;
@@ -266,7 +266,7 @@ void StoreScene::Update()
                     if (alreadyExist == false)
                     {
                         // 새로생성 + 가격 차감
-                        InventoryManager::GetSingleton()->SetAddInven(new INVEN_INFO(ObjectType::CROPS, 0, listIndex, price, cropName, 1));
+                        InventoryManager::GetSingleton()->SetAddInven(new INVEN_INFO(ObjectType::CROPS, 0, listIndex, price, 0, cropName, 1));
                         InventoryManager::GetSingleton()->SetPlayerMoneyDecrease(price);
                     }
                     // vInven에 있다

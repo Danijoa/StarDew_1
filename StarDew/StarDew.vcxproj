@@ -153,6 +153,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainGame.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PondMake.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="StartScene.cpp" />
     <ClCompile Include="StoreData.cpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="LoadingScene.h" />
     <ClInclude Include="MainGame.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="PondMake.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Singleton.h" />
     <ClInclude Include="SortInterface.h" />
