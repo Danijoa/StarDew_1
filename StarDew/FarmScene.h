@@ -4,6 +4,7 @@
 class Image;
 class Player;
 class StoreData;
+class PondMake;
 class FarmScene : public GameNode
 {
 private:
@@ -33,6 +34,9 @@ private:
 	// 위치 알려주는 검정 렉트
 	HPEN hpen;
 	HPEN hpenOld;
+
+	// 연못 만들자
+	PondMake* pondMake;
 
 	// 
 	int farmDir;

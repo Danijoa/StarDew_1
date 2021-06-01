@@ -4,6 +4,7 @@
 #include "Player.h"
 #include "InventoryManager.h"
 #include "StoreData.h"
+#include "PondMake.h"
 
 HRESULT FarmScene::Init()
 {
@@ -46,6 +47,10 @@ HRESULT FarmScene::Init()
 	// ºû
 	ImageManager::GetSingleton()->AddImage("ºû", "Image/blackLight.bmp", WINSIZE_X, WINSIZE_Y);
 	light = ImageManager::GetSingleton()->FindImage("ºû");
+
+	// ¿¬¸ø
+	pondMake = new PondMake();
+	pondMake->Init();
 
 	return S_OK;
 }
@@ -753,6 +758,9 @@ void FarmScene::Update()
 
 	// ³¯Â¥°¡ Èê·¶À¸¸é
 	DataManager::GetSingleton()->Update();
+
+	// ¿¬¸ø
+	pondMake->Update();
 }
 
 void FarmScene::Render(HDC hdc)
@@ -901,6 +909,9 @@ void FarmScene::Render(HDC hdc)
 
 	hpen = (HPEN)::SelectObject(hdc, hpenOld);
 	DeleteObject(hpen);
+
+	// ¿¬¸ø
+	pondMake->Render(hdc);
 
 	// ÀÎº¥Åä¸®
 	InventoryManager::GetSingleton()->Render(hdc);

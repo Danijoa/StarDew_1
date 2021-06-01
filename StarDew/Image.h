@@ -67,8 +67,6 @@ public:
 		};
 	} IMAGE_INFO, * LPIMAGE_INFO;
 
-	// 회전 벡터
-	POINT* myPoint;          //CONST
 
 private:
 	IMAGE_INFO* imageInfo;		// 이미지 정보 구조체 포인터
@@ -77,6 +75,9 @@ private:
 	COLORREF transColor;
 
 	BLENDFUNCTION blendFunc;
+
+	// 회전 벡터
+	POINT* myPoint;          //CONST
 
 public:
 	// 빈 비트맵 이미지를 만드는 함수

@@ -46,6 +46,9 @@
     <Filter Include="UI">
       <UniqueIdentifier>{3a6f5ce6-61ef-4bad-a2b1-2e4e3749641f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MakePond">
+      <UniqueIdentifier>{ddbf1744-02b7-429c-87bb-62e7305a8505}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KeyManager.cpp">
@@ -106,7 +109,7 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="PondMake.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>MakePond</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -183,7 +186,7 @@
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="PondMake.h">
-      <Filter>헤더 파일</Filter>
+      <Filter>MakePond</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -14,6 +14,8 @@ HRESULT Image::Init(int width, int height)
     imageInfo->height = height;
     imageInfo->loadType = IMAGE_LOAD_KIND::EMPTY;
 
+    myPoint = nullptr;
+
     ReleaseDC(g_hWnd, hdc);
 
     if (imageInfo->hBitmap == NULL)
@@ -62,8 +64,8 @@ HRESULT Image::Init(const char* fileName, int width, int height,
     imageInfo->hResetBit = CreateCompatibleBitmap(hdc, imageInfo->width * 2.5, imageInfo->height * 2.5);
     imageInfo->hOldResetBit = (HBITMAP)SelectObject(imageInfo->hResetDC, imageInfo->hResetBit);
 
-    myPoint = new POINT();
-
+    myPoint = new POINT[3];
+    
     ReleaseDC(g_hWnd, hdc);
 
     if (imageInfo->hBitmap == NULL)
@@ -104,6 +106,8 @@ HRESULT Image::Init(const char* fileName, int width, int height, int maxFrameX, 
     imageInfo->frameHeight = height / maxFrameY;
     imageInfo->currFrameX = 0;
     imageInfo->currFrameY = 0;
+
+    myPoint = nullptr;
 
     ReleaseDC(g_hWnd, hdc);
 
@@ -327,9 +331,10 @@ void Image::FrameListRender(HDC hdc, int destX, int destY, int tempHeight, int t
 void Image::RotateRender(HDC hdc, int destX, int destY, float len, float angle)
 {
     len += 0.5f;
-
+    
     //POINT* myPoint;          //CONST
-    //myPoint = new POINT();
+    //myPoint = new POINT[3];
+    
     myPoint[0].x = (LONG)(len + cosf((135.0f + angle) * PI / 180.0f) * (len * sqrt(2))); // 왼쪽 상단
     myPoint[0].y = (LONG)(len - sinf((135.0f + angle) * PI / 180.0f) * (len * sqrt(2)));
     myPoint[1].x = (LONG)(len + cosf((45.0f + angle) * PI / 180.0f) * (len * sqrt(2)));  // 오른쪽 상단

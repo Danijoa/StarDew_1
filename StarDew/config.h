@@ -51,14 +51,14 @@ typedef struct tagFPoint
 	float y;
 } FPOINT, * PFPOINT;
 
-extern enum class TileType {
+enum class TileType {
 	WALL, GROUND, HOUSEDOOR, CAVE, FLOOR, STOREDOOR, POND, COUNTER, BUSSTOP,
 	WOOD, STONE, FIBER,
 	DIG, WETDIG,
 	CROP
 };
 
-extern enum class SeedType {
+enum class SeedType {
 	NONE, CROP, 
 	PARSNIP, CAULIFLOWER, RHUBARB, BLUEBERRY, CRANBERRIES, FAIRYROSE,
 	ANCIENTFRUIT, GREENBEAN, GRAPE
@@ -93,7 +93,7 @@ typedef struct rectIndex
 	int bottomIndex;
 }INT_RECTINDEX;
 
-extern enum class ObjectType { NONE, TOOLS, CROPS, CROPGROWN};
+enum class ObjectType { NONE, TOOLS, CROPS, CROPGROWN};
 
 typedef struct myIven
 {
