@@ -11,6 +11,7 @@ private:
 	char szText[128] = "";
 
 	Image* backBuffer;
+	Image* mouseCursor;
 
 public:
 	HRESULT Init();

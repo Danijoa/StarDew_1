@@ -231,10 +231,10 @@ void HouseScene::Render(HDC hdc)
                 houseTileInfo[tempIndex].frameX,
                 houseTileInfo[tempIndex].frameY);
 
-            if (houseTileInfo[tempIndex].tileType == TileType::WALL)
+            if (houseTileInfo[tempIndex].tileType == TileType::WALL && KeyManager::GetSingleton()->IsStayKeyDown('T'))
             {
-                //Rectangle(hdc, tempPosX, tempPosY,
-                    //tempPosX + TILESIZE, tempPosY + TILESIZE);
+                Rectangle(hdc, tempPosX, tempPosY,
+                    tempPosX + TILESIZE, tempPosY + TILESIZE);
             }
 
         }

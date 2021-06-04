@@ -441,15 +441,15 @@ void InventoryManager::Render(HDC hdc)
     /*확인용*/
 	if (vInven[downIndex.x] == NULL)
 	{
-		wsprintf(szText, "선택 아이템: x ");
-		TextOut(hdc, 0, 30, szText, strlen(szText));
+		//wsprintf(szText, "선택 아이템: x ");
+		//TextOut(hdc, 0, 30, szText, strlen(szText));
 	}
 	else
 	{
-		wsprintf(szText, "선택 아이템: %s ", vInven[downIndex.x]->productName.c_str());
-		TextOut(hdc, 0, 30, szText, strlen(szText));
+		//wsprintf(szText, "선택 아이템: %s ", vInven[downIndex.x]->productName.c_str());
+		//TextOut(hdc, 0, 30, szText, strlen(szText));
 
-        wsprintf(szText, "판매 가격: %d ", vInven[downIndex.x]->salePrice);
-        TextOut(hdc, 0, 45, szText, strlen(szText));
+        //wsprintf(szText, "판매 가격: %d ", vInven[downIndex.x]->salePrice);
+        //TextOut(hdc, 0, 45, szText, strlen(szText));
 	}
 }

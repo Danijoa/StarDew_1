@@ -28,7 +28,7 @@ using namespace std;
 #define TILEMAPTOOLSIZE_X	1900
 #define TILEMAPTOOLSIZE_Y	900
 #define TILESIZE (32)	//(16*4/2)
-#define F_TILESIZE (16*4)
+#define F_TILESIZE (16*4)	//64
 
 // Áý
 #define HOUSE_TILE_X (44)		//(1408/16/4*2)
@@ -55,7 +55,8 @@ enum class TileType {
 	WALL, GROUND, HOUSEDOOR, CAVE, FLOOR, STOREDOOR, POND, COUNTER, BUSSTOP,
 	WOOD, STONE, FIBER,
 	DIG, WETDIG,
-	CROP
+	CROP,
+	PONDMADE, PONDEDGE
 };
 
 enum class SeedType {

@@ -108,27 +108,35 @@ void FarmScene::playerFarmCollision()
 			DataManager::GetSingleton()->SetPreScene(2); // 현재 씬(마당=2) 저장
 			SceneManager::GetSingleton()->ChangeScene("상점씬");
 		}
-		if (farmTileInfo[left + top * FARM_TILE_X].tileType == TileType::WALL)	// left,top
+		if (farmTileInfo[left + top * FARM_TILE_X].tileType == TileType::WALL
+			|| farmTileInfo[left + top * FARM_TILE_X].tileType == TileType::PONDMADE)	// left,top
 			canMove = false;
-		if (farmTileInfo[right + top * FARM_TILE_X].tileType == TileType::WALL)	// right,top
+		if (farmTileInfo[right + top * FARM_TILE_X].tileType == TileType::WALL
+			|| farmTileInfo[right + top * FARM_TILE_X].tileType == TileType::PONDMADE)	// right,top
 			canMove = false;
 		break;
 	case 1:
-		if (farmTileInfo[left + bottom * FARM_TILE_X].tileType == TileType::WALL)	// left,bottom
+		if (farmTileInfo[left + bottom * FARM_TILE_X].tileType == TileType::WALL
+			|| farmTileInfo[left + bottom * FARM_TILE_X].tileType == TileType::PONDMADE)	// left,bottom
 			canMove = false;
-		if (farmTileInfo[right + bottom * FARM_TILE_X].tileType == TileType::WALL)	// right,bottom
+		if (farmTileInfo[right + bottom * FARM_TILE_X].tileType == TileType::WALL
+			|| farmTileInfo[right + bottom * FARM_TILE_X].tileType == TileType::PONDMADE)	// right,bottom
 			canMove = false;
 		break;
 	case 2:
-		if (farmTileInfo[left + top * FARM_TILE_X].tileType == TileType::WALL)	// left,top
+		if (farmTileInfo[left + top * FARM_TILE_X].tileType == TileType::WALL
+			|| farmTileInfo[left + top * FARM_TILE_X].tileType == TileType::PONDMADE)	// left,top
 			canMove = false;
-		if (farmTileInfo[left + bottom * FARM_TILE_X].tileType == TileType::WALL)	// left,bottom
+		if (farmTileInfo[left + bottom * FARM_TILE_X].tileType == TileType::WALL
+			|| farmTileInfo[left + bottom * FARM_TILE_X].tileType == TileType::PONDMADE)	// left,bottom
 			canMove = false;
 		break;
 	case 3:
-		if (farmTileInfo[right + top * FARM_TILE_X].tileType == TileType::WALL)	// right,top
+		if (farmTileInfo[right + top * FARM_TILE_X].tileType == TileType::WALL
+			|| farmTileInfo[right + top * FARM_TILE_X].tileType == TileType::PONDMADE)	// right,top
 			canMove = false;
-		if (farmTileInfo[right + bottom * FARM_TILE_X].tileType == TileType::WALL)	// right,bottom
+		if (farmTileInfo[right + bottom * FARM_TILE_X].tileType == TileType::WALL
+			|| farmTileInfo[right + bottom * FARM_TILE_X].tileType == TileType::PONDMADE)	// right,bottom
 			canMove = false;
 		break;
 	default:
@@ -157,27 +165,33 @@ void FarmScene::testDigUp()
 		if (canDig)
 		{
 			// 체력 줄이자
-			InventoryManager::GetSingleton()->SetEnergy(5);
+			InventoryManager::GetSingleton()->SetEnergy(8);
 
 			int posX = (g_ptMouse.x + renderCoor.x) / F_TILESIZE;
 			int posY = (g_ptMouse.y + renderCoor.y) / F_TILESIZE;
 
-			farmTileInfo[posX + FARM_TILE_X * posY].tileType = TileType::DIG;
-			farmTileInfo[posX + FARM_TILE_X * posY].objFrameX = 0;
-			farmTileInfo[posX + FARM_TILE_X * posY].objFrameY = 2;
+			// 땅인 곳 만 파자
+			if (farmTileInfo[posX + FARM_TILE_X * posY].tileType == TileType::GROUND)
+			{
+				farmTileInfo[posX + FARM_TILE_X * posY].tileType = TileType::DIG;
+				farmTileInfo[posX + FARM_TILE_X * posY].objFrameX = 0;
+				farmTileInfo[posX + FARM_TILE_X * posY].objFrameY = 2;
+			}
 
 			for (int i = 0; i < 9; i++)
 			{
 				int neighborX = posX + neighborDir[i][0];
 				int neighborY = posY + neighborDir[i][1];
 
-				if (farmTileInfo[neighborX + FARM_TILE_X * neighborY].tileType == TileType::GROUND) // 밭 아닌 경우는 검사 x
+				if (farmTileInfo[neighborX + FARM_TILE_X * neighborY].tileType != TileType::DIG
+					&& farmTileInfo[neighborX + FARM_TILE_X * neighborY].tileType != TileType::WETDIG)	// 밭or물밭 아닌 경우는 검사 x
 					continue;
 
 				int check = 0;
 				for (int j = 0; j < 4; j++)
 				{
-					if (farmTileInfo[(neighborX + dir[j][0]) + FARM_TILE_X * (neighborY + dir[j][1])].tileType != TileType::GROUND)
+					if (farmTileInfo[(neighborX + dir[j][0]) + FARM_TILE_X * (neighborY + dir[j][1])].tileType == TileType::DIG
+						|| farmTileInfo[(neighborX + dir[j][0]) + FARM_TILE_X * (neighborY + dir[j][1])].tileType == TileType::WETDIG)
 						check += pow(10, j);    // 상:1 하:10 좌:100 우:1000
 				}
 
@@ -760,11 +774,15 @@ void FarmScene::Update()
 	DataManager::GetSingleton()->Update();
 
 	// 연못
+	pondMake->SetCurPlayerRectPos({ player->GetPlayerRect().left, player->GetPlayerRect().top});
+	pondMake->SetRenderCoor(renderCoor);
+	pondMake->SetStartFrame(startFrame);
 	pondMake->Update();
 }
 
 void FarmScene::Render(HDC hdc)
 {
+	// 농장 + 밭
 	for (int i = startFrame.y; i <= startFrame.y + WINSIZE_Y / F_TILESIZE + 1; i++)        // 세로
 	{
 		for (int j = startFrame.x; j <= startFrame.x + WINSIZE_X / F_TILESIZE + 1; j++)    // 가로
@@ -792,7 +810,7 @@ void FarmScene::Render(HDC hdc)
 			}
 
 			// 벽
-			if (farmTileInfo[tempIndex].tileType == TileType::WALL || farmTileInfo[tempIndex].tileType == TileType::POND)
+			if (farmTileInfo[tempIndex].tileType == TileType::WALL || farmTileInfo[tempIndex].tileType == TileType::PONDMADE)
 			{
 				 //Rectangle(hdc, tempPosX, tempPosY,
 					 //tempPosX + F_TILESIZE, tempPosY + F_TILESIZE);
@@ -803,6 +821,10 @@ void FarmScene::Render(HDC hdc)
 		}
 	}
 
+	// 연못
+	pondMake->Render(hdc);
+
+	// 곡식
 	for (int i = startFrame.y; i <= startFrame.y + WINSIZE_Y / F_TILESIZE + 1; i++)        // 세로
 	{
 		for (int j = startFrame.x; j <= startFrame.x + WINSIZE_X / F_TILESIZE + 1; j++)    // 가로
@@ -847,6 +869,7 @@ void FarmScene::Render(HDC hdc)
 	// 플레이어
 	player->Render(hdc);
 
+	// 곡식
 	for (int i = startFrame.y; i <= startFrame.y + WINSIZE_Y / F_TILESIZE + 1; i++)        // 세로
 	{
 		for (int j = startFrame.x; j <= startFrame.x + WINSIZE_X / F_TILESIZE + 1; j++)    // 가로
@@ -909,9 +932,6 @@ void FarmScene::Render(HDC hdc)
 
 	hpen = (HPEN)::SelectObject(hdc, hpenOld);
 	DeleteObject(hpen);
-
-	// 연못
-	pondMake->Render(hdc);
 
 	// 인벤토리
 	InventoryManager::GetSingleton()->Render(hdc);

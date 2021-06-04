@@ -8,6 +8,7 @@
 #include "DataManager.h"
 #include "InventoryManager.h"
 #include "LoadingScene.h"
+#include "ImageManager.h"
 
 HRESULT MainGame::Init()
 {
@@ -36,10 +37,15 @@ HRESULT MainGame::Init()
 
 	// ½ÃÀÛ ¾À -> ÀÎ°ÔÀÓÀº x¹è·Î Å°¿ö¼­ Ãâ·ÂÇÏÀÚ
 	//SceneManager::GetSingleton()->ChangeScene("Å¸ÀÏ¸ÊÅø");
-	//SceneManager::GetSingleton()->ChangeScene("½ÃÀÛ¾À");
+	SceneManager::GetSingleton()->ChangeScene("½ÃÀÛ¾À");
 	//SceneManager::GetSingleton()->ChangeScene("ÇÏ¿ì½º¾À");
-	SceneManager::GetSingleton()->ChangeScene("³óÀå¾À");
+	//SceneManager::GetSingleton()->ChangeScene("³óÀå¾À");
 	//SceneManager::GetSingleton()->ChangeScene("»óÁ¡¾À");
+
+	// ¸¶¿ì½º Ä¿¼­ ¼û±â±â
+	ImageManager::GetSingleton()->AddImage("¸¶¿ì½ºÄ¿¼­", "Image/mouseCursor.bmp", 16 * 1.5, 20 * 1.5, true, RGB(255, 255, 255));
+	mouseCursor = ImageManager::GetSingleton()->FindImage("¸¶¿ì½ºÄ¿¼­");
+	ShowCursor(false);
 
 	return S_OK;
 }
@@ -69,10 +75,15 @@ void MainGame::Render()
 
 	SceneManager::GetSingleton()->Render(hBackDC);
 
-
 	// ¸¶¿ì½º ÁÂÇ¥
-	wsprintf(szText, "X : %d, Y : %d", g_ptMouse.x, g_ptMouse.y);
-	TextOut(hBackDC, 80, 0, szText, strlen(szText));
+	//wsprintf(szText, "X : %d, Y : %d", g_ptMouse.x, g_ptMouse.y);
+	//TextOut(hBackDC, 80, 0, szText, strlen(szText));
+
+	// ¸¶¿ì½º ·»´õ
+	if (mouseCursor)
+	{
+		mouseCursor->Render(hBackDC, g_ptMouse.x, g_ptMouse.y);
+	} 
 
 	// FPS
 	TimerManager::GetSingleton()->Render(hBackDC);
