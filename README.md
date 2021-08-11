@@ -1,4 +1,4 @@
-## Simulation Game
+# Simulation Game
 스타듀밸리 모작을 기반으로한 농장 경영 게임 
 
  <img src ="https://user-images.githubusercontent.com/49131724/128915397-6eed5745-7d74-48ba-985b-a00ac5e9be9f.png" width="49%"> <img src ="https://user-images.githubusercontent.com/49131724/128911801-7242119c-bc01-4200-b661-7358d6177d8a.png" width="49%">
